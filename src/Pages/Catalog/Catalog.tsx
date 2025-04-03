@@ -7,7 +7,6 @@ import {
   Text,
   Spinner,
   Center,
-
   Button,
   ButtonGroup,
   Flex,
@@ -82,12 +81,11 @@ const Catalog = () => {
   return (
     <Center flexDirection="row" gap={6} p={4}>
       <Box p={4}>
-        <Center mb={8} >
-          <ButtonGroup attached variant="outline" >
+        <Center mb={8}>
+          <ButtonGroup attached variant="outline">
             <Button
               onClick={() => setSelectedCategory("todos")}
               _active={{ bg: "blue.500", color: "white" }}
-              
               bg={selectedCategory === "todos" ? "blue.500" : undefined}
               color={selectedCategory === "todos" ? "white" : undefined}
             >
@@ -120,13 +118,12 @@ const Catalog = () => {
           </ButtonGroup>
         </Center>
 
-
         {filteredJewels.length === 0 ? (
-          <Center h="200px" >
+          <Center h="200px">
             <Text>Nenhuma joia encontrada nesta categoria.</Text>
           </Center>
         ) : (
-          <Flex flexDirection="row"  gap={6}>
+          <Flex flexDirection="row" gap={6}>
             {filteredJewels.map((jewel) => (
               <Box
                 key={jewel.id}
