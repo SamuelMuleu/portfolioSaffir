@@ -2,6 +2,7 @@ import { Box, Center, Heading, Image } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
+import logo from "../public/assets/logo.png";
 
 function App() {
   return (
@@ -10,7 +11,7 @@ function App() {
         <Box textAlign="center" width="98vw">
           <Heading mb={4}>
             <Image
-              src="../src/assets/logo.png"
+              src={logo}
               alt="logo"
               boxSize="200px"
               objectFit="contain"
