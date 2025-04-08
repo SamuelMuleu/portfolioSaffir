@@ -77,7 +77,7 @@ const AdminPanel = () => {
   return (
     <Box p={4} maxW="md" mx="auto" >
       <Text fontSize="xl" mb={4} fontWeight="bold">
-        Painel Administrativo
+        Painel Administrativo.
       </Text>
 
       {status === "success" && (
