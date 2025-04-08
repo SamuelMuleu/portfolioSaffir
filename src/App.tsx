@@ -2,7 +2,7 @@ import { Box, Center, Heading, Image } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
-import logo from "../public/assets/logo.png";
+import logo from "./assets/logo.png";
 
 function App() {
   return (

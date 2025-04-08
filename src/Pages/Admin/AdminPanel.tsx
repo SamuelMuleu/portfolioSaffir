@@ -8,7 +8,10 @@ import {
   Alert,
   AlertTitle,
   AlertDescription,
+  Portal,
+  createListCollection,
 } from "@chakra-ui/react";
+import { Select } from "@chakra-ui/react";
 import { uploadJewelry } from "../../firebaseUpload";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
@@ -17,6 +20,7 @@ const AdminPanel = () => {
   const [image, setImage] = useState<File | null>(null);
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
+  const [category, setCategories] = useState<string>("");
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -48,11 +52,12 @@ const AdminPanel = () => {
 
     setStatus("uploading");
     try {
-      await uploadJewelry(image, name, price);
+      await uploadJewelry(image, name, price, category);
       setStatus("success");
       setImage(null);
       setName("");
       setPrice("");
+      setCategories("");
       setPreview(null);
       setErrorMessage("");
     } catch (error) {
@@ -73,9 +78,39 @@ const AdminPanel = () => {
       }
     };
   }, [preview]);
+  const items = createListCollection({
+    items: [
+      { label: "Correntaria", value: "correntaria" },
+      { label: "Conjuntos", value: "conjuntos" },
+      { label: "Alianças", value: "aliancas" },
+      { label: "Aneis", value: "Aneis" },
+      { label: "Brincos", value: "Brincos" },
+    ],
+  });
+  const formatCurrency = (value: string) => {
+    // Remove tudo que não é dígito
+  
+    let digits = value.replace(/\D/g, "");
 
+    // Adiciona zeros à esquerda para garantir 2 decimais
+    digits = digits.padStart(3, "0");
+
+    // Formata como R$ 0,00
+    const formatted = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(parseInt(digits) / 100);
+
+    return formatted;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const formattedValue = formatCurrency(rawValue);
+    setPrice(formattedValue);
+  };
   return (
-    <Box p={4} maxW="md" mx="auto" >
+    <Box p={4} maxW="md" mx="auto">
       <Text fontSize="xl" mb={4} fontWeight="bold">
         Painel Administrativo.
       </Text>
@@ -105,15 +140,63 @@ const AdminPanel = () => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         mb={4}
+
       />
 
       <Input
-        placeholder="Preço da joia"
+        placeholder="R$ 0,00"
         value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        onChange={handleChange}
         mb={4}
       />
-
+      <Box mb={4}>
+        <Select.Root
+          collection={items}
+          onValueChange={({ value }) => {
+            setCategories(value[0]);
+          }}
+          maxW="md"
+          mx="auto"
+          size="sm"
+          width="320px"
+        >
+          <Select.HiddenSelect />
+          <Select.Label>Selecione a Categoria</Select.Label>
+          <Select.Control>
+            <Select.Trigger>
+              <Select.ValueText
+                maxW="md"
+                mx="auto"
+                placeholder="Selecione a Categoria"
+                color={"white"}
+              />
+            </Select.Trigger>
+            <Select.IndicatorGroup>
+              <Select.Indicator />
+            </Select.IndicatorGroup>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content>
+                {items.items.map((item) => (
+                  <Select.Item
+                    key={item.value}
+                    item={item}
+                    _hover={{ bg: "#1c3050" }}
+                    _selected={{ color: "white" }}
+                    color="white"
+                    px={4}
+                    py={2}
+                  >
+                    {item.label}
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+        </Select.Root>
+      </Box>
       <Box mb={4}>
         <Text mb={2}>Imagem da joia:</Text>
         <Input

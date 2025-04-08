@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import {
@@ -8,9 +8,14 @@ import {
   Spinner,
   Center,
   Button,
+  Grid,
+  IconButton,
   ButtonGroup,
-  Flex,
+  CloseButton,
+  Dialog,
+  Portal,
 } from "@chakra-ui/react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 interface Jewel {
   id: string;
@@ -21,11 +26,15 @@ interface Jewel {
   createdAt?: Date;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 const Catalog = () => {
   const [jewels, setJewels] = useState<Jewel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedJewel, setSelectedJewel] = useState<Jewel | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchJewels = async () => {
@@ -49,10 +58,26 @@ const Catalog = () => {
     fetchJewels();
   }, []);
 
-  const filteredJewels =
-    selectedCategory === "todos"
+  const dynamicCategories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(jewels.map((jewel) => jewel.category))
+    );
+    return ["todos", ...uniqueCategories];
+  }, [jewels]);
+
+  const filteredJewels = useMemo(() => {
+    return selectedCategory === "todos"
       ? jewels
       : jewels.filter((jewel) => jewel.category === selectedCategory);
+  }, [jewels, selectedCategory]);
+
+  // Paginação
+  const paginatedJewels = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredJewels.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredJewels, currentPage]);
+
+  const totalPages = Math.ceil(filteredJewels.length / ITEMS_PER_PAGE);
 
   if (loading) {
     return (
@@ -79,82 +104,164 @@ const Catalog = () => {
   }
 
   return (
-    <Center flexDirection="row" gap={6} p={4}>
-      <Box p={4}>
-        <Center mb={8}>
-          <ButtonGroup attached variant="outline">
+    <Box p={4}>
+      <Center mb={8}>
+        <ButtonGroup variant="outline" _active={{ bg: "#1c3050" }}>
+          {dynamicCategories.map((category) => (
             <Button
-              onClick={() => setSelectedCategory("todos")}
-              _active={{ bg: "blue.500", color: "white" }}
-              bg={selectedCategory === "todos" ? "blue.500" : undefined}
-              color={selectedCategory === "todos" ? "white" : undefined}
+              key={category}
+              onClick={() => {
+                setSelectedCategory(category);
+                setCurrentPage(1);
+              }}
+              _active={{ bg: "#0e2d5b", color: "black" }}
+              bg={selectedCategory === category ? "#0e2d5b" : undefined}
+              color={selectedCategory === category ? "black" : undefined}
+              textTransform="capitalize"
             >
-              Todos
+              {category}
             </Button>
-            <Button
-              onClick={() => setSelectedCategory("correntaria")}
-              _active={{ bg: "blue.500", color: "white" }}
-              bg={selectedCategory === "correntaria" ? "blue.500" : undefined}
-              color={selectedCategory === "correntaria" ? "white" : undefined}
-            >
-              Correntaria
-            </Button>
-            <Button
-              onClick={() => setSelectedCategory("conjuntos")}
-              _active={{ bg: "blue.500", color: "white" }}
-              bg={selectedCategory === "conjuntos" ? "blue.500" : undefined}
-              color={selectedCategory === "conjuntos" ? "white" : undefined}
-            >
-              Conjuntos
-            </Button>
-            <Button
-              onClick={() => setSelectedCategory("aliancas")}
-              _active={{ bg: "blue.500", color: "white" }}
-              bg={selectedCategory === "aliancas" ? "blue.500" : undefined}
-              color={selectedCategory === "aliancas" ? "white" : undefined}
-            >
-              Alianças
-            </Button>
-          </ButtonGroup>
-        </Center>
+          ))}
+        </ButtonGroup>
+      </Center>
 
-        {filteredJewels.length === 0 ? (
-          <Center h="200px">
-            <Text>Nenhuma joia encontrada nesta categoria.</Text>
-          </Center>
-        ) : (
-          <Flex flexDirection="row" gap={6}>
-            {filteredJewels.map((jewel) => (
+      {paginatedJewels.length === 0 ? (
+        <Center h="200px">
+          <Text>Nenhuma joia encontrada nesta categoria.</Text>
+        </Center>
+      ) : (
+        <>
+          <Grid
+            templateColumns={{
+              base: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            }}
+            gap={6}
+          >
+            {paginatedJewels.map((jewel) => (
               <Box
                 key={jewel.id}
                 p={4}
-                borderWidth="1px"
-                borderRadius="lg"
-                boxShadow="md"
-                _hover={{ boxShadow: "lg", transform: "scale(1.02)" }}
+                rounded="lg"
+                _hover={{ transform: "scale(1.02)" }}
                 transition="all 0.2s"
               >
-                <Image
-                  src={jewel.imageBase64}
-                  alt={jewel.name}
-                  boxSize="200px"
-                  objectFit="contain"
-                  borderRadius="md"
-                  mx="auto"
-                  loading="lazy"
-                />
+                <Dialog.Root
+                  onOpenChange={(isOpen) => {
+                    if (isOpen) setSelectedJewel(jewel);
+                    else setSelectedJewel(null);
+                  }}
+                >
+                  <Dialog.Trigger asChild>
+                    <Image
+                      src={jewel.imageBase64}
+                      alt={jewel.name}
+                      boxSize="350px"
+                      objectFit="contain"
+                      rounded="xs"
+                      w="80%"
+                      h="80%"
+                      mx="auto"
+                      loading="lazy"
+                      cursor="pointer"
+                      _hover={{ transform: "scale(1.05)" }}
+                      transition="transform 0.2s"
+                    />
+                  </Dialog.Trigger>
+                  <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                      <Dialog.Content
+                        bg="#e8e2d2"
+                        maxW="90vw"
+                 
+                        mt="10px"
+                        p={4}
+                      >
+                        <Dialog.Header>
+                          <Dialog.Title
+                            color="#1c3050"
+                            fontWeight={"bold"}
+                          ></Dialog.Title>
+                          <Dialog.CloseTrigger asChild>
+                            <CloseButton
+                              position="absolute"
+                              right="8px"
+                              top="8px"
+                              fontWeight={"bold"}
+                              color="white"
+                            />
+                          </Dialog.CloseTrigger>
+                        </Dialog.Header>
+                        <Dialog.Body>
+                          {selectedJewel && (
+                            <>
+                              <Image
+                                src={selectedJewel.imageBase64}
+                                alt={selectedJewel.name}
+                                objectFit="contain"
+                                maxH="90vh"
+                                mt="-50px"
+                                w="100%"
+                              />
+                            </>
+                          )}
+                        </Dialog.Body>
+                      </Dialog.Content>
+                    </Dialog.Positioner>
+                  </Portal>
+                </Dialog.Root>
                 <Text mt={2} fontWeight="bold" textAlign="center">
                   {jewel.name}
                 </Text>
-                <Text fontSize="sm" color="gray.500" textAlign="center">
-                  {jewel.category}
+                <Text fontSize="sm" color="#1c3050" textAlign="center">
+                  {jewel.price}
                 </Text>
               </Box>
             ))}
-          </Flex>
-        )}
-      </Box>
-    </Center>
+          </Grid>
+
+          {/* Controles de Paginação */}
+          <Center mt={8}>
+            <ButtonGroup>
+              <IconButton
+                bg={"#0e2d5b"}
+                aria-label="Página anterior"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <LuChevronLeft />
+              </IconButton>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    bg={"#0e2d5b"}
+                    key={page}
+                    variant={currentPage === page ? "solid" : "outline"}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
+
+              <IconButton
+                bg={"#0e2d5b"}
+                aria-label="Próxima página"
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              >
+                <LuChevronRight />
+              </IconButton>
+            </ButtonGroup>
+          </Center>
+        </>
+      )}
+    </Box>
   );
 };
 
