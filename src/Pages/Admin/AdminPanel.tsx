@@ -13,6 +13,9 @@ import {
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { uploadJewelry } from "../../firebaseUpload";
+import ManageJewelries from "../../components/ManageJewelries";
+import UploadJewelForm from "@/components/UploadJewelForm";
+import { Jewel } from "../Catalog/Catalog";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
@@ -24,6 +27,18 @@ const AdminPanel = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const [showManagePanel, setShowManagePanel] = useState(false);
+  const [editingJewel, setEditingJewel] = useState<Jewel | null>(null);
+
+  const switchToManagePanel = () => {
+    setShowManagePanel(true);
+    setEditingJewel(null);
+  };
+
+  const switchToUploadPanel = () => {
+    setShowManagePanel(false);
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -89,7 +104,7 @@ const AdminPanel = () => {
   });
   const formatCurrency = (value: string) => {
     // Remove tudo que não é dígito
-  
+
     let digits = value.replace(/\D/g, "");
 
     // Adiciona zeros à esquerda para garantir 2 decimais
@@ -109,8 +124,35 @@ const AdminPanel = () => {
     const formattedValue = formatCurrency(rawValue);
     setPrice(formattedValue);
   };
+  const handleEditJewel = (jewel: Jewel) => {
+    setEditingJewel(jewel);
+    setShowManagePanel(false); // volta para o formulário
+  };
+
   return (
     <Box p={4} maxW="md" mx="auto">
+      {(!showManagePanel || editingJewel) ? (
+        <>
+          <UploadJewelForm
+            editingJewel={editingJewel}
+            onSuccess={switchToManagePanel}
+            onCancel={switchToManagePanel}
+          />
+          <Button
+            onClick={switchToManagePanel}
+            colorScheme="teal"
+            mt={4}
+            width="full"
+          >
+            Gerenciar Joias
+          </Button>
+        </>
+      ) : (
+        <ManageJewelries
+          switchToUploadPanel={switchToUploadPanel}
+          setEditingJewel={() => handleEditJewel}
+        />
+      )}
       <Text fontSize="xl" mb={4} fontWeight="bold">
         Painel Administrativo.
       </Text>
@@ -140,7 +182,6 @@ const AdminPanel = () => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         mb={4}
-
       />
 
       <Input

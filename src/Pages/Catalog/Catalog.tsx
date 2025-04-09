@@ -17,11 +17,12 @@ import {
 } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
-interface Jewel {
+type JewelCategory = "correntaria" | "conjuntos" | "aliancas" | "aneis" | "brincos";
+export interface Jewel {
   id: string;
   name: string;
   price: string;
-  category: string;
+  category: JewelCategory;
   imageBase64: string;
   createdAt?: Date;
 }
@@ -106,7 +107,7 @@ const Catalog = () => {
   return (
     <Box p={4}>
       <Center mb={8}>
-        <ButtonGroup variant="outline" _active={{ bg: "#1c3050" }}>
+        <ButtonGroup variant="outline">
           {dynamicCategories.map((category) => (
             <Button
               key={category}
@@ -114,9 +115,9 @@ const Catalog = () => {
                 setSelectedCategory(category);
                 setCurrentPage(1);
               }}
-              _active={{ bg: "#0e2d5b", color: "black" }}
-              bg={selectedCategory === category ? "#0e2d5b" : undefined}
-              color={selectedCategory === category ? "black" : undefined}
+              w={{ base: "86px", md: "100px" }}
+              bg={selectedCategory === category ? "#0e2d5b" : ""}
+              color={selectedCategory === category ? "black" : ""}
               textTransform="capitalize"
             >
               {category}
@@ -157,11 +158,9 @@ const Catalog = () => {
                     <Image
                       src={jewel.imageBase64}
                       alt={jewel.name}
-                      boxSize="350px"
                       objectFit="contain"
                       rounded="xs"
-                      w="80%"
-                      h="80%"
+                      w={{ base: "10rem", md: "300px" }}
                       mx="auto"
                       loading="lazy"
                       cursor="pointer"
@@ -172,13 +171,7 @@ const Catalog = () => {
                   <Portal>
                     <Dialog.Backdrop />
                     <Dialog.Positioner>
-                      <Dialog.Content
-                        bg="#e8e2d2"
-                        maxW="90vw"
-                 
-                        mt="10px"
-                        p={4}
-                      >
+                      <Dialog.Content bg="#e8e2d2" maxW="90vw" mt="10px" p={4}>
                         <Dialog.Header>
                           <Dialog.Title
                             color="#1c3050"
@@ -201,7 +194,7 @@ const Catalog = () => {
                                 src={selectedJewel.imageBase64}
                                 alt={selectedJewel.name}
                                 objectFit="contain"
-                                maxH="90vh"
+                                h={{ base: "70vh", md: "90vh" }}
                                 mt="-50px"
                                 w="100%"
                               />
