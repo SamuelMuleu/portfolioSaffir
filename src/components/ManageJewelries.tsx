@@ -1,22 +1,30 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Image, Text, Flex, Spinner } from "@chakra-ui/react";
-import { deleteJewelry, getJewelries } from "../firebaseUpload";
-import { toaster } from "./ui/toaster";
+import {
+  Box,
+  Button,
+  Image,
+  Text,
+  Flex,
+  Spinner,
+  Grid,
+} from "@chakra-ui/react";
+import { deleteJewelry } from "../firebaseUpload";
 
-type Jewel = {
-  id: string;
-  name: string;
-  price: string;
-  category: string;
-  imageBase64: string; // Alterado de imageUrl para imageBase64
-};
+import { Jewel } from "@/types/Jewel";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebaseConfig";
 
 type ManageJewelriesProps = {
   switchToUploadPanel: () => void;
+  switchToUploadForm: () => void;
   setEditingJewel: (jewel: Jewel | null) => void;
 };
 
-const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelriesProps) => {
+const ManageJewelries = ({
+  switchToUploadPanel,
+  switchToUploadForm,
+  setEditingJewel,
+}: ManageJewelriesProps) => {
   const [jewelries, setJewelries] = useState<Jewel[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -24,24 +32,20 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
   const loadJewelries = async () => {
     try {
       setLoading(true);
-      const jewels = await getJewelries();
-      setJewelries(jewels);
-      toaster.create({
-        title: "Sucesso",
-        description: "Joias carregadas com sucesso",
-        duration: 2000,
-        type: "success",
-        closable: true,
+      const snapshot = await getDocs(collection(db, "joias"));
+      const jewels = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          price: data.price,
+          category: data.category,
+          imageBase64: data.imageBase64,
+        };
       });
+      setJewelries(jewels);
     } catch (error) {
       console.error(error);
-      toaster.create({
-        title: "Erro",
-        description: "Falha ao carregar joias",
-        type: "error",
-        duration: 3000,
-        closable: true,
-      });
     } finally {
       setLoading(false);
     }
@@ -49,27 +53,13 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Tem certeza que deseja excluir esta joia?")) return;
-    
+
     try {
       setDeletingId(id);
       await deleteJewelry(id);
       await loadJewelries();
-      toaster.create({
-        title: "Sucesso",
-        description: "Joia excluída com sucesso",
-        duration: 2000,
-        type: "success",
-        closable: true,
-      });
     } catch (error) {
       console.error(error);
-      toaster.create({
-        title: "Erro",
-        description: "Falha ao excluir joia",
-        type: "error",
-        duration: 3000,
-        closable: true,
-      });
     } finally {
       setDeletingId(null);
     }
@@ -77,21 +67,20 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
 
   const handleEdit = (jewel: Jewel) => {
     setEditingJewel(jewel);
-    switchToUploadPanel();
+    switchToUploadForm();
   };
 
   useEffect(() => {
     loadJewelries();
   }, []);
+  const handleAddNew = () => {
+    setEditingJewel(null);
+    switchToUploadPanel();
+  };
 
   return (
     <Box>
-      <Button 
-        onClick={switchToUploadPanel} 
-        colorScheme="blue" 
-        mb={4}
-        size="sm"
-      >
+      <Button onClick={handleAddNew} colorScheme="blue" mb={4} size="sm">
         Adicionar Nova Joia
       </Button>
 
@@ -100,22 +89,37 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
           <Spinner size="xl" />
         </Flex>
       ) : jewelries.length === 0 ? (
-        <Text textAlign="center" py={8}>Nenhuma joia cadastrada.</Text>
+        <Text textAlign="center" py={8}>
+          Nenhuma joia cadastrada.
+        </Text>
       ) : (
-        <Flex wrap="wrap" gap={4}>
+        <Grid
+          templateColumns={{
+            base: "repeat(1, 1fr)",
+            md: "repeat(3, 1fr)",
+            lg: "repeat(4, 1fr)",
+          }}
+          mx={"auto"}
+          justifyContent={"center"}
+        >
           {jewelries.map((jewel) => (
-            <Box 
+            <Box
               key={jewel.id}
               p={4}
               borderWidth="1px"
               borderRadius="md"
-              width={["100%", "calc(50% - 16px)", "calc(33.333% - 16px)"]}
+              mx={"auto"}
+              width={{
+                base: "70%",
+                md: "80%",
+                lg: "90%",
+              }}
               boxShadow="md"
               _hover={{ boxShadow: "lg" }}
               transition="all 0.2s"
             >
-              <Image 
-                src={jewel.imageBase64} // Alterado para imageBase64
+              <Image
+                src={jewel.imageBase64}
                 alt={jewel.name}
                 boxSize="150px"
                 objectFit="contain"
@@ -132,10 +136,10 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
               <Text fontSize="sm" color="gray.500" mb={3}>
                 {jewel.category}
               </Text>
-              
+
               <Flex mt={3} gap={2}>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   colorScheme="blue"
                   onClick={() => handleEdit(jewel)}
                   flex={1}
@@ -143,9 +147,9 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
                 >
                   Editar
                 </Button>
-                <Button 
-                  size="sm" 
-                  colorScheme="red"
+                <Button
+                  size="sm"
+                  color={"red.400"}
                   onClick={() => handleDelete(jewel.id)}
                   flex={1}
                   loading={deletingId === jewel.id}
@@ -156,7 +160,7 @@ const ManageJewelries = ({ switchToUploadPanel, setEditingJewel }: ManageJewelri
               </Flex>
             </Box>
           ))}
-        </Flex>
+        </Grid>
       )}
     </Box>
   );

@@ -14,18 +14,10 @@ import {
   CloseButton,
   Dialog,
   Portal,
+  Stack,
 } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-
-type JewelCategory = "correntaria" | "conjuntos" | "aliancas" | "aneis" | "brincos";
-export interface Jewel {
-  id: string;
-  name: string;
-  price: string;
-  category: JewelCategory;
-  imageBase64: string;
-  createdAt?: Date;
-}
+import { Jewel } from "@/types/Jewel";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -105,9 +97,14 @@ const Catalog = () => {
   }
 
   return (
-    <Box p={4}>
-      <Center mb={8}>
-        <ButtonGroup variant="outline">
+    <Box mb={8} display="flex" flexWrap="wrap" gap={1} justifyContent="center">
+      <Center mb={2} px={{ base: 2, md: 0 }}>
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          overflowX={{ base: "visible", md: "visible" }}
+          w="full"
+        >
           {dynamicCategories.map((category) => (
             <Button
               key={category}
@@ -115,15 +112,19 @@ const Catalog = () => {
                 setSelectedCategory(category);
                 setCurrentPage(1);
               }}
-              w={{ base: "86px", md: "100px" }}
-              bg={selectedCategory === category ? "#0e2d5b" : ""}
-              color={selectedCategory === category ? "black" : ""}
+              w={{ base: "100%", md: "110px" }}
+              bg={selectedCategory === category ? "#0e2d5b" : "transparent"}
+              color={selectedCategory === category ? "white" : "gray.800"}
               textTransform="capitalize"
+              fontSize={{ base: "sm", md: "md" }}
+              _hover={{
+                bg: selectedCategory === category ? "#0e2d5b" : "#e8e2d2",
+              }}
             >
               {category}
             </Button>
           ))}
-        </ButtonGroup>
+        </Stack>
       </Center>
 
       {paginatedJewels.length === 0 ? (

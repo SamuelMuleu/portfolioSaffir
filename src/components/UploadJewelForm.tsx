@@ -10,9 +10,9 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { updateJewelry, uploadJewelry } from "@/firebaseUpload";
-import { toaster } from "./ui/toaster";
 import { Select } from "@chakra-ui/react";
-import { Jewel } from "@/Pages/Catalog/Catalog";
+import { Jewel } from "@/types/Jewel";
+
 type UploadJewelFormProps = {
   editingJewel: Jewel | null;
   onSuccess: () => void;
@@ -40,13 +40,50 @@ const UploadJewelForm = ({
 
   const [category, setCategory] = useState<JewelCategory | "">("");
 
+  const formatCurrency = (value: string) => {
+    let digits = value.replace(/\D/g, "");
+    digits = digits.padStart(3, "0");
 
+    const formatted = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(parseInt(digits) / 100);
+
+    return formatted;
+  };
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+
+    const unformatted = rawValue.replace(/\D/g, "");
+
+    if (unformatted === "") {
+      setPrice("");
+      return;
+    }
+
+    const formattedValue = formatCurrency(unformatted);
+    setPrice(formattedValue);
+  };
+  useEffect(() => {
+    if (editingJewel) {
+      setPrice(editingJewel.price);
+      setName(editingJewel.name);
+      setCategory(editingJewel.category);
+      setPreview(editingJewel.imageBase64);
+    }
+  }, [editingJewel]);
   useEffect(() => {
     if (editingJewel) {
       setName(editingJewel.name);
       setPrice(editingJewel.price);
       setCategory(editingJewel.category);
       setPreview(editingJewel.imageBase64);
+    } else {
+      setName("");
+      setPrice("");
+      setCategory("");
+      setPreview("");
+      setImage(null);
     }
   }, [editingJewel]);
 
@@ -79,22 +116,8 @@ const UploadJewelForm = ({
           category,
           image: image || undefined,
         });
-        toaster.create({
-          title: "Sucesso",
-          description: "Joias carregadas com sucesso",
-          duration: 2000,
-          type: "success",
-          closable: true,
-        });
       } else {
         await uploadJewelry(image!, name, price, category);
-        toaster.create({
-          title: "Sucesso",
-          description: "Joias carregadas com sucesso",
-          duration: 2000,
-          type: "success",
-          closable: true,
-        });
       }
       onSuccess();
     } catch (err) {
@@ -112,11 +135,14 @@ const UploadJewelForm = ({
       { label: "Brincos", value: "Brincos" },
     ],
   });
+  const handleCategoryChange = (value: string[]) => {
+    setCategory(value[0] as JewelCategory);
+  };
 
   return (
     <Box>
       <Text fontSize="lg" mb={4} fontWeight="bold">
-        {editingJewel ? "Editar Joia" : "Editar Joia"}
+        {editingJewel ? "Editar Joia" : "Cadastrar Nova Joia"}
       </Text>
 
       {error && (
@@ -134,19 +160,28 @@ const UploadJewelForm = ({
       />
 
       <Input
-        placeholder="Preço"
+        placeholder="R$ 0,00"
         value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        onChange={handlePriceChange}
         mb={4}
       />
 
-      <Select.Root size="sm" collection={items}>
+      <Select.Root
+        size="sm"
+        collection={items}
+        onValueChange={({ value }) => handleCategoryChange(value)}
+        defaultValue={category ? [category] : undefined}
+      >
         <Select.HiddenSelect />
         <Select.Label />
 
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText />
+            <Select.ValueText
+              placeholder={category}
+              mx="auto"
+              color={"white"}
+            />
           </Select.Trigger>
           <Select.IndicatorGroup>
             <Select.Indicator />
