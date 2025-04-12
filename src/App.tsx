@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
 import logo from "./assets/logo.png";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminPanel />} />
             <Route path="/admin/jewel/:id" element={<AdminPanel />} />
           </Routes>
+          <Footer/>
         </Box>
       </Center>
     </Router>

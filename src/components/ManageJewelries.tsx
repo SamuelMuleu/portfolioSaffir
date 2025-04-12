@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Button,
@@ -7,12 +7,15 @@ import {
   Flex,
   Spinner,
   Grid,
+  InputGroup,
+  Input,
 } from "@chakra-ui/react";
 import { deleteJewelry } from "../firebaseUpload";
 
 import { Jewel } from "@/types/Jewel";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
+import { LuSearch } from "react-icons/lu";
 
 type ManageJewelriesProps = {
   switchToUploadPanel: () => void;
@@ -28,6 +31,15 @@ const ManageJewelries = ({
   const [jewelries, setJewelries] = useState<Jewel[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredJewelries = useMemo(() => {
+    return jewelries.filter(
+      (jewel) =>
+        jewel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        jewel.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [jewelries, searchTerm]);
 
   const loadJewelries = async () => {
     try {
@@ -80,17 +92,37 @@ const ManageJewelries = ({
 
   return (
     <Box>
-      <Button onClick={handleAddNew} colorScheme="blue" mb={4} size="sm">
-        Adicionar Nova Joia
-      </Button>
+      <Flex
+        mb={4}
+        gap={4}
+        alignItems={"center"}
+        justifyContent={"center"}
+        direction={{ base: "column", md: "row" }}
+      >
+        <Button onClick={handleAddNew} mb={4} size="sm">
+          Adicionar Nova Joia
+        </Button>
+
+        <InputGroup maxW="400px" startElement={<LuSearch />} mb={4}>
+          <Input
+            placeholder="Buscar "
+            value={searchTerm}
+            height="36px"
+            borderRadius={"lg"}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchTerm(e.target.value)
+            }
+          />
+        </InputGroup>
+      </Flex>
 
       {loading ? (
-        <Flex justify="center" py={8}>
+        <Flex justifyContent={"center"} alignItems={"center"} py={8}>
           <Spinner size="xl" />
         </Flex>
-      ) : jewelries.length === 0 ? (
+      ) : filteredJewelries.length === 0 ? (
         <Text textAlign="center" py={8}>
-          Nenhuma joia cadastrada.
+          {searchTerm ? "Nenhuma joia encontrada" : "Nenhuma joia cadastrada"}
         </Text>
       ) : (
         <Grid
@@ -99,10 +131,11 @@ const ManageJewelries = ({
             md: "repeat(3, 1fr)",
             lg: "repeat(4, 1fr)",
           }}
-          mx={"auto"}
           justifyContent={"center"}
+          alignItems={"center"}
+          gap={4}
         >
-          {jewelries.map((jewel) => (
+          {filteredJewelries.map((jewel) => (
             <Box
               key={jewel.id}
               p={4}
@@ -114,6 +147,7 @@ const ManageJewelries = ({
                 md: "80%",
                 lg: "90%",
               }}
+              height={"100%"}
               boxShadow="md"
               _hover={{ boxShadow: "lg" }}
               transition="all 0.2s"
@@ -123,6 +157,7 @@ const ManageJewelries = ({
                 alt={jewel.name}
                 boxSize="150px"
                 objectFit="contain"
+                maxH="150px"
                 mx="auto"
                 mb={3}
                 borderRadius="md"
@@ -140,7 +175,6 @@ const ManageJewelries = ({
               <Flex mt={3} gap={2}>
                 <Button
                   size="sm"
-                  colorScheme="blue"
                   onClick={() => handleEdit(jewel)}
                   flex={1}
                   variant="outline"

@@ -197,7 +197,9 @@ const UploadJewelForm = ({
                 item={item}
                 _hover={{ bg: "#1c3050" }}
                 _selected={{ color: "white" }}
-                color="white"
+                color="black"
+                justifyContent={"center"}
+                bg="#e8e2d2"
                 px={4}
                 py={2}
               >
@@ -225,12 +227,7 @@ const UploadJewelForm = ({
       )}
 
       <Flex gap={2}>
-        <Button
-          onClick={handleSubmit}
-          colorScheme="blue"
-          flex={1}
-          loading={isLoading}
-        >
+        <Button onClick={handleSubmit} flex={1} loading={isLoading}>
           {editingJewel ? "Atualizar" : "Cadastrar"}
         </Button>
 

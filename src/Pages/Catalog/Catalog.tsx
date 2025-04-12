@@ -112,7 +112,7 @@ const Catalog = () => {
                 setSelectedCategory(category);
                 setCurrentPage(1);
               }}
-              w={{ base: "100%", md: "110px" }}
+              w={{ base: "100%", md: "100px" }}
               bg={selectedCategory === category ? "#0e2d5b" : "transparent"}
               color={selectedCategory === category ? "white" : "gray.800"}
               textTransform="capitalize"
@@ -220,7 +220,7 @@ const Catalog = () => {
           <Center mt={8}>
             <ButtonGroup>
               <IconButton
-                bg={"#0e2d5b"}
+
                 aria-label="Página anterior"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -231,8 +231,7 @@ const Catalog = () => {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
                   <Button
-                    bg={"#0e2d5b"}
-                    key={page}
+                 key={page}
                     variant={currentPage === page ? "solid" : "outline"}
                     onClick={() => setCurrentPage(page)}
                   >
@@ -242,8 +241,8 @@ const Catalog = () => {
               )}
 
               <IconButton
-                bg={"#0e2d5b"}
-                aria-label="Próxima página"
+ 
+               aria-label="Próxima página"
                 disabled={currentPage === totalPages}
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

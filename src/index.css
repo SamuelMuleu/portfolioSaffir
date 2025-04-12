@@ -2,7 +2,7 @@
   font-family: "Montserrat", sans-serif !important;
   line-height: 1.5;
   font-weight: 400;
-
+  
   color: #162538;
   background-color: #e8e2d2;
 
@@ -14,6 +14,8 @@
 
 body {
   margin: 0;
+  padding:0;
+  box-sizing:border-box;
   display: flex;
   place-items: center;
   min-width: 320px;
@@ -32,9 +34,13 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #102c5b;
   cursor: pointer;
   transition: border-color 0.25s;
+  color:white
+}
+button:hover{
+  background-color:rgb(8, 55, 136);
 }
 
 button:focus,

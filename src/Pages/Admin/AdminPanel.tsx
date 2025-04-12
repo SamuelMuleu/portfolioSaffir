@@ -17,7 +17,7 @@ import { uploadJewelry } from "../../firebaseUpload";
 import ManageJewelries from "../../components/ManageJewelries";
 import UploadJewelForm from "@/components/UploadJewelForm";
 import { Jewel } from "@/types/Jewel";
-
+import { GiJewelCrown } from "react-icons/gi";
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const AdminPanel = () => {
@@ -140,8 +140,8 @@ const AdminPanel = () => {
     if (status === "success") {
       const timer = setTimeout(() => {
         setStatus("idle");
-      }, 5000); 
-  
+      }, 5000);
+
       return () => clearTimeout(timer);
     }
   }, [status]);
@@ -167,10 +167,15 @@ const AdminPanel = () => {
         />
       ) : (
         <>
-          <Button onClick={switchToManagePanel}>Gerenciar</Button>
+          <Button onClick={switchToManagePanel} color={"white"}>
+          <GiJewelCrown />
 
+            Gerenciar
+          </Button>
+
+      
           <Text fontSize="xl" mb={4} fontWeight="bold">
-            Painel Administrativo.
+            Cadastrar Joia
           </Text>
 
           {status === "success" && (
@@ -244,7 +249,9 @@ const AdminPanel = () => {
                         item={item}
                         _hover={{ bg: "#1c3050" }}
                         _selected={{ color: "white" }}
-                        color="white"
+                        color="black"
+                        justifyContent={"center"}
+                        bg="#e8e2d2"
                         px={4}
                         py={2}
                       >
@@ -285,7 +292,6 @@ const AdminPanel = () => {
             onClick={handleUpload}
             loading={status === "uploading"}
             loadingText="Enviando..."
-            colorScheme="blue"
             width="full"
             disabled={!image || !name}
           >
