@@ -11,19 +11,13 @@ import {
 } from "@chakra-ui/react";
 import { updateJewelry, uploadJewelry } from "@/firebaseUpload";
 import { Select } from "@chakra-ui/react";
-import { Jewel } from "@/types/Jewel";
+import { Jewel, JewelCategory } from "@/types/Jewel";
 
 type UploadJewelFormProps = {
   editingJewel: Jewel | null;
   onSuccess: () => void;
   onCancel: () => void;
 };
-type JewelCategory =
-  | "correntaria"
-  | "conjuntos"
-  | "aliancas"
-  | "aneis"
-  | "brincos";
 
 const UploadJewelForm = ({
   editingJewel,
@@ -33,12 +27,11 @@ const UploadJewelForm = ({
   const [image, setImage] = useState<File | null>(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-
   const [preview, setPreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState("");
   const [error, setError] = useState("");
-
-  const [category, setCategory] = useState<JewelCategory | "">("");
+  const [categories, setCategories] = useState<JewelCategory[]>([]);
 
   const formatCurrency = (value: string) => {
     let digits = value.replace(/\D/g, "");
@@ -51,9 +44,9 @@ const UploadJewelForm = ({
 
     return formatted;
   };
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
-
     const unformatted = rawValue.replace(/\D/g, "");
 
     if (unformatted === "") {
@@ -64,24 +57,19 @@ const UploadJewelForm = ({
     const formattedValue = formatCurrency(unformatted);
     setPrice(formattedValue);
   };
-  useEffect(() => {
-    if (editingJewel) {
-      setPrice(editingJewel.price);
-      setName(editingJewel.name);
-      setCategory(editingJewel.category);
-      setPreview(editingJewel.imageBase64);
-    }
-  }, [editingJewel]);
+
   useEffect(() => {
     if (editingJewel) {
       setName(editingJewel.name);
       setPrice(editingJewel.price);
-      setCategory(editingJewel.category);
+      setCategories(editingJewel.categories);
+      setDescription(editingJewel.description);
       setPreview(editingJewel.imageBase64);
     } else {
       setName("");
       setPrice("");
-      setCategory("");
+      setDescription("");
+      setCategories([]);
       setPreview("");
       setImage(null);
     }
@@ -102,8 +90,8 @@ const UploadJewelForm = ({
   };
 
   const handleSubmit = async () => {
-    if (!name) {
-      setError("Por favor, insira um nome para a joia.");
+    if (!name || !description || categories.length === 0) {
+      setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
@@ -113,11 +101,16 @@ const UploadJewelForm = ({
         await updateJewelry(editingJewel.id, {
           name,
           price,
-          category,
+          categories,
+          description,
           image: image || undefined,
         });
       } else {
-        await uploadJewelry(image!, name, price, category);
+        if (!image) {
+          setError("Por favor, selecione uma imagem.");
+          return;
+        }
+        await uploadJewelry(image, name, price, categories, description);
       }
       onSuccess();
     } catch (err) {
@@ -126,17 +119,19 @@ const UploadJewelForm = ({
       setIsLoading(false);
     }
   };
+
   const items = createListCollection({
     items: [
       { label: "Correntaria", value: "correntaria" },
       { label: "Conjuntos", value: "conjuntos" },
       { label: "Alianças", value: "aliancas" },
-      { label: "Aneis", value: "Aneis" },
-      { label: "Brincos", value: "Brincos" },
+      { label: "Aneis", value: "aneis" },
+      { label: "Brincos", value: "brincos" },
     ],
   });
+
   const handleCategoryChange = (value: string[]) => {
-    setCategory(value[0] as JewelCategory);
+    setCategories(value as JewelCategory[]);
   };
 
   return (
@@ -146,9 +141,9 @@ const UploadJewelForm = ({
       </Text>
 
       {error && (
-        <Alert.Root status="info" title="This is the alert title">
+        <Alert.Root status="info" title="Error">
           <Alert.Indicator />
-          <Alert.Title>This is the alert title</Alert.Title>
+          <Alert.Title>Error {error}</Alert.Title>
         </Alert.Root>
       )}
 
@@ -158,7 +153,12 @@ const UploadJewelForm = ({
         onChange={(e) => setName(e.target.value)}
         mb={4}
       />
-
+      <Input
+        placeholder="Descrição da joia"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        mb={4}
+      />
       <Input
         placeholder="R$ 0,00"
         value={price}
@@ -170,15 +170,20 @@ const UploadJewelForm = ({
         size="sm"
         collection={items}
         onValueChange={({ value }) => handleCategoryChange(value)}
-        defaultValue={category ? [category] : undefined}
+        defaultValue={categories}
+        multiple
       >
         <Select.HiddenSelect />
-        <Select.Label />
+        <Select.Label>Categorias</Select.Label>
 
         <Select.Control>
           <Select.Trigger>
             <Select.ValueText
-              placeholder={category}
+              placeholder={
+                categories.length > 0
+                  ? categories.join(", ")
+                  : "Selecione as categorias"
+              }
               mx="auto"
               color={"white"}
             />
@@ -196,7 +201,7 @@ const UploadJewelForm = ({
                 key={item.value}
                 item={item}
                 _hover={{ bg: "#1c3050" }}
-                _selected={{ color: "white" }}
+                _selected={{ color: "black", bg: "#1c3050" }}
                 color="black"
                 justifyContent={"center"}
                 bg="#e8e2d2"

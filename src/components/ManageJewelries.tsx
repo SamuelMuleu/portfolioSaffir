@@ -37,7 +37,11 @@ const ManageJewelries = ({
     return jewelries.filter(
       (jewel) =>
         jewel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        jewel.category.toLowerCase().includes(searchTerm.toLowerCase())
+        jewel.categories.some(
+          (category) =>
+            category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            jewel.description.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
   }, [jewelries, searchTerm]);
 
@@ -49,20 +53,25 @@ const ManageJewelries = ({
         const data = doc.data();
         return {
           id: doc.id,
-          name: data.name,
-          price: data.price,
-          category: data.category,
-          imageBase64: data.imageBase64,
-        };
+          name: data.name || "",
+          price: data.price || "",
+
+          categories: Array.isArray(data.categories)
+            ? data.categories
+            : data.category
+            ? [data.category]
+            : [],
+          description: data.description || "",
+          imageBase64: data.imageBase64 || "",
+        } as Jewel;
       });
       setJewelries(jewels);
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao carregar joias:", error);
     } finally {
       setLoading(false);
     }
   };
-
   const handleDelete = async (id: string) => {
     if (!window.confirm("Tem certeza que deseja excluir esta joia?")) return;
 
@@ -168,10 +177,20 @@ const ManageJewelries = ({
               <Text color="blue.600" fontWeight="medium" mb={1}>
                 {jewel.price}
               </Text>
-              <Text fontSize="sm" color="gray.500" mb={3}>
-                {jewel.category}
+              <Text color="gray.500" fontWeight="medium" mb={1}>
+                {jewel.description}
               </Text>
 
+              {jewel.categories.map((category) => (
+                <Box
+                  key={category}
+                  borderRadius="md"
+                  fontSize="xs"
+                  fontWeight="medium"
+                >
+                  {category}
+                </Box>
+              ))}
               <Flex mt={3} gap={2}>
                 <Button
                   size="sm"

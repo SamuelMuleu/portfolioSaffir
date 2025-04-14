@@ -14,12 +14,12 @@ import {
   CloseButton,
   Dialog,
   Portal,
-  Stack,
 } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { Jewel } from "@/types/Jewel";
+import { Jewel, JewelCategory } from "@/types/Jewel";
+import { CategoryFilter } from "@/components/CategoryFIlter";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 8;
 
 const Catalog = () => {
   const [jewels, setJewels] = useState<Jewel[]>([]);
@@ -50,18 +50,27 @@ const Catalog = () => {
 
     fetchJewels();
   }, []);
-
   const dynamicCategories = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(jewels.map((jewel) => jewel.category))
+    if (!jewels) return ["todos"];
+
+    const allCategories = jewels.flatMap((jewel) =>
+      Array.isArray(jewel?.categories) ? jewel.categories : []
     );
-    return ["todos", ...uniqueCategories];
+
+    return ["todos", ...Array.from(new Set(allCategories))];
   }, [jewels]);
 
   const filteredJewels = useMemo(() => {
-    return selectedCategory === "todos"
-      ? jewels
-      : jewels.filter((jewel) => jewel.category === selectedCategory);
+    if (selectedCategory === "todos") {
+      return jewels;
+    }
+
+    return jewels.filter((jewel) => {
+      if (!jewel || !Array.isArray(jewel.categories)) {
+        return false;
+      }
+      return jewel.categories.includes(selectedCategory as JewelCategory);
+    });
   }, [jewels, selectedCategory]);
 
   // Paginação
@@ -98,34 +107,14 @@ const Catalog = () => {
 
   return (
     <Box mb={8} display="flex" flexWrap="wrap" gap={1} justifyContent="center">
-      <Center mb={2} px={{ base: 2, md: 0 }}>
-        <Stack
-          direction={{ base: "column", md: "row" }}
-          align="center"
-          overflowX={{ base: "visible", md: "visible" }}
-          w="full"
-        >
-          {dynamicCategories.map((category) => (
-            <Button
-              key={category}
-              onClick={() => {
-                setSelectedCategory(category);
-                setCurrentPage(1);
-              }}
-              w={{ base: "100%", md: "100px" }}
-              bg={selectedCategory === category ? "#0e2d5b" : "transparent"}
-              color={selectedCategory === category ? "white" : "gray.800"}
-              textTransform="capitalize"
-              fontSize={{ base: "sm", md: "md" }}
-              _hover={{
-                bg: selectedCategory === category ? "#0e2d5b" : "#e8e2d2",
-              }}
-            >
-              {category}
-            </Button>
-          ))}
-        </Stack>
-      </Center>
+      <CategoryFilter
+        categories={dynamicCategories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={(cat) => {
+          setSelectedCategory(cat);
+          setCurrentPage(1);
+        }}
+      />
 
       {paginatedJewels.length === 0 ? (
         <Center h="200px">
@@ -148,7 +137,25 @@ const Catalog = () => {
                 rounded="lg"
                 _hover={{ transform: "scale(1.02)" }}
                 transition="all 0.2s"
+                borderColor={jewel.isPromotion ? "red.200" : "gray.200"}
               >
+                {jewel.isPromotion && (
+                  <Box
+                    position="absolute"
+                    top={2}
+                    right={2}
+                    bg="red.500"
+                    color="white"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    fontSize="xs"
+                    fontWeight="bold"
+                    zIndex={1}
+                  >
+                    {jewel.promotionTag || "PROMOÇÃO"}
+                  </Box>
+                )}
                 <Dialog.Root
                   onOpenChange={(isOpen) => {
                     if (isOpen) setSelectedJewel(jewel);
@@ -168,6 +175,17 @@ const Catalog = () => {
                       _hover={{ transform: "scale(1.05)" }}
                       transition="transform 0.2s"
                     />
+                    {jewel.isPromotion && (
+                      <Box
+                        position="absolute"
+                        top={0}
+                        left={0}
+                        right={0}
+                        bottom={0}
+                        bg="rgba(255,0,0,0.05)"
+                        borderRadius="md"
+                      />
+                    )}
                   </Dialog.Trigger>
                   <Portal>
                     <Dialog.Backdrop />
@@ -199,6 +217,43 @@ const Catalog = () => {
                                 mt="-50px"
                                 w="100%"
                               />
+                              {jewel.isPromotion && jewel.originalPrice ? (
+                                <Box alignItems="center" gap={2} mb={1}>
+                                  <Text
+                                    color="red.500"
+                                    fontWeight="bold"
+                                    fontSize="lg"
+                                  >
+                                    {jewel.price}
+                                  </Text>
+                                  <Text
+                                    color="gray.500"
+                                    textDecoration="line-through"
+                                    fontSize="sm"
+                                  >
+                                    {jewel.originalPrice}
+                                  </Text>
+                                </Box>
+                              ) : (
+                                <Text
+                                  color="blue.600"
+                                  fontWeight="medium"
+                                  mb={1}
+                                >
+                                  {jewel.price}
+                                </Text>
+                              )}
+                              <Box mt={4} p={4}>
+                                <Text
+                                  fontSize="md"
+                                  color="gray.700"
+                                  lineHeight="tall"
+                                  whiteSpace="pre-line"
+                                >
+                                  Descrição:
+                                </Text>
+                                <Text mt={2}> {selectedJewel.description}</Text>
+                              </Box>
                             </>
                           )}
                         </Dialog.Body>
@@ -216,11 +271,9 @@ const Catalog = () => {
             ))}
           </Grid>
 
-          {/* Controles de Paginação */}
           <Center mt={8}>
             <ButtonGroup>
               <IconButton
-
                 aria-label="Página anterior"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -231,7 +284,7 @@ const Catalog = () => {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
                   <Button
-                 key={page}
+                    key={page}
                     variant={currentPage === page ? "solid" : "outline"}
                     onClick={() => setCurrentPage(page)}
                   >
@@ -241,8 +294,7 @@ const Catalog = () => {
               )}
 
               <IconButton
- 
-               aria-label="Próxima página"
+                aria-label="Próxima página"
                 disabled={currentPage === totalPages}
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

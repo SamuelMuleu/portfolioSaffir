@@ -5,9 +5,9 @@ interface Jewel {
     name:string,
     image:string
     price:string;
-    category:string;
+    categories:string[];
 }
-const JewelCard = ({ name, image,price,category }:Jewel) => {
+const JewelCard = ({ name, image,price,categories }:Jewel) => {
   return (
     <Box
       borderWidth="1px"
@@ -34,7 +34,7 @@ const JewelCard = ({ name, image,price,category }:Jewel) => {
   borderRadius="full"
   display="inline-block"
 >
-  {category}
+  {categories}
 </Text>
     </Box>
   );

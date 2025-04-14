@@ -1,24 +1,20 @@
 import { db } from "./firebaseConfig";
 import { collection, addDoc, doc, deleteDoc, updateDoc, getDocs } from "firebase/firestore";
+import { Jewel, JewelCategory } from "./types/Jewel";
 
-// Tipos para melhor organização
-type Jewel = {
-  id: string;
-  name: string;
-  price: string;
-  category: string;
-  imageBase64: string;
-  createdAt: Date;
-};
 
-// Função para upload de nova joia (já existente)
+
 export const uploadJewelry = async (
-  file: File, 
-  name: string, 
+  file: File,
+  name: string,
   price: string,
-  category: string
+  categories: JewelCategory[],
+  description: string,
+  isPromotion?: boolean,
+  originalPrice?: string,
+  promotionTag?: string
 ): Promise<Jewel> => {
-  if (!file || !name || !price || !category) {
+  if (!file || !name || !price || !categories || categories.length === 0 || !description) {
     throw new Error("Todos os campos são obrigatórios");
   }
 
@@ -27,25 +23,32 @@ export const uploadJewelry = async (
   const docRef = await addDoc(collection(db, "joias"), {
     name,
     price,
-    category,
+    categories: isPromotion ? [...categories, "promocao"] : categories,
+    description,
     imageBase64,
-    createdAt: new Date(),
+    isPromotion: isPromotion || false,
+    originalPrice: isPromotion ? originalPrice : null,
+    promotionTag: isPromotion ? promotionTag : null,
+
   });
 
-  return { 
-    id: docRef.id, 
-    name, 
-    price, 
-    category, 
+  return {
+    id: docRef.id,
+    name,
+    price,
+    categories: isPromotion ? [...categories, "Promoção" as JewelCategory] : categories,
+    description,
     imageBase64,
-    createdAt: new Date() 
+    isPromotion: isPromotion || false,
+    originalPrice: isPromotion ? originalPrice : undefined,
+    promotionTag: isPromotion ? promotionTag : undefined,
+
   };
 };
 
-// Função para deletar joia
 export const deleteJewelry = async (id: string): Promise<void> => {
   if (!id) throw new Error("ID da joia é obrigatório");
-  
+
   try {
     await deleteDoc(doc(db, "joias", id));
   } catch (error) {
@@ -54,18 +57,21 @@ export const deleteJewelry = async (id: string): Promise<void> => {
   }
 };
 
-// Função para atualizar joia
 export const updateJewelry = async (
   id: string,
   data: {
     name: string;
     price: string;
-    category: string;
+    description: string;
+    categories: JewelCategory[];
     image?: File;
+    isPromotion?: boolean;
+    originalPrice?: string;
+    promotionTag?: string;
   }
 ): Promise<Jewel> => {
   if (!id) throw new Error("ID da joia é obrigatório");
-  if (!data.name || !data.price || !data.category) {
+  if (!data.name || !data.price || !data.categories || data.categories.length === 0) {
     throw new Error("Nome, preço e categoria são obrigatórios");
   }
 
@@ -73,32 +79,36 @@ export const updateJewelry = async (
   const updateData: Partial<Jewel> = {
     name: data.name,
     price: data.price,
-    category: data.category,
+    description: data.description,
+    categories: data.categories,
+    isPromotion: data.isPromotion || false,
+    originalPrice: data.isPromotion ? data.originalPrice : undefined,
+    promotionTag: data.isPromotion ? data.promotionTag : undefined,
   };
 
-  // Se uma nova imagem foi fornecida, converte para Base64
   if (data.image) {
     updateData.imageBase64 = await convertToBase64(data.image);
   }
 
   try {
     await updateDoc(jewelRef, updateData);
-    
-    // Retorna os dados atualizados (nota: isso não inclui a imagem atualizada no retorno)
-    return { 
+
+    return {
       id,
       name: data.name,
       price: data.price,
-      category: data.category,
-      imageBase64: updateData.imageBase64 || '', // Será preenchido se houver nova imagem
-      createdAt: new Date() // Nota: isso será sobrescrito - considere buscar o documento
+      categories: data.categories,
+      description: data.description,
+      imageBase64: updateData.imageBase64 || '',
+      isPromotion: data.isPromotion || false,
+      originalPrice: data.isPromotion ? data.originalPrice : undefined,
+      promotionTag: data.isPromotion ? data.promotionTag : undefined,
     };
   } catch (error) {
     console.error("Erro ao atualizar joia:", error);
     throw new Error("Falha ao atualizar joia");
   }
 };
-
 // Função auxiliar para converter arquivo para Base64
 const convertToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -109,7 +119,6 @@ const convertToBase64 = (file: File): Promise<string> => {
   });
 };
 
-// Função adicional para buscar todas as joias
 export const getJewelries = async (): Promise<Jewel[]> => {
   try {
     const querySnapshot = await getDocs(collection(db, "joias"));
@@ -117,9 +126,12 @@ export const getJewelries = async (): Promise<Jewel[]> => {
       id: doc.id,
       name: doc.data().name,
       price: doc.data().price,
-      category: doc.data().category,
+      description: doc.data().description || "",
+      categories: doc.data().categories || [],
       imageBase64: doc.data().imageBase64,
-      createdAt: doc.data().createdAt.toDate(),
+      isPromotion: doc.data().isPromotion || false,
+      originalPrice: doc.data().originalPrice || undefined,
+      promotionTag: doc.data().promotionTag || undefined,
     }));
   } catch (error) {
     console.error("Erro ao buscar joias:", error);

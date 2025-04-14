@@ -11,23 +11,30 @@ import {
   Portal,
   createListCollection,
   Stack,
+  HStack,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { uploadJewelry } from "../../firebaseUpload";
 import ManageJewelries from "../../components/ManageJewelries";
 import UploadJewelForm from "@/components/UploadJewelForm";
-import { Jewel } from "@/types/Jewel";
+import { Jewel, JewelCategory } from "@/types/Jewel";
 import { GiJewelCrown } from "react-icons/gi";
+import { colorPalettes } from "../../compositions/lib/color-palettes";
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const AdminPanel = () => {
   const [image, setImage] = useState<File | null>(null);
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
-  const [category, setCategories] = useState<string>("");
+  const [categories, setCategories] = useState<JewelCategory[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
+  const [originalPrice, setOriginalPrice] = useState<string>(""); // Novo campo
   const [status, setStatus] = useState<UploadStatus>("idle");
+  const [isPromotion, setIsPromotion] = useState(false); // Novo estado
+  const [promotionTag, setPromotionTag] = useState(""); // Novo campo
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   const [showManagePanel, setShowManagePanel] = useState(false);
 
@@ -69,19 +76,35 @@ const AdminPanel = () => {
   };
 
   const handleUpload = async () => {
-    if (!image || !name) {
+    if (!image || !name || !description) {
       setErrorMessage("Por favor, insira um nome e selecione uma imagem.");
+      return;
+    }
+    if (isPromotion && !originalPrice) {
+      setErrorMessage("Por favor, insira o preço original para promoções.");
       return;
     }
 
     setStatus("uploading");
     try {
-      await uploadJewelry(image, name, price, category);
+      await uploadJewelry(
+        image,
+        name,
+        price,
+        isPromotion ? [...categories, "Promoção" as JewelCategory] : categories,
+        description,
+        isPromotion, // Novo parâmetro
+        isPromotion ? originalPrice : undefined, // Novo parâmetro
+        isPromotion ? promotionTag : undefined // Novo parâmetro
+      );
       setStatus("success");
       setImage(null);
       setName("");
       setPrice("");
-      setCategories("");
+      setDescription("");
+      setOriginalPrice("");
+      setPromotionTag("");
+      setCategories([]);
       setPreview(null);
       setErrorMessage("");
     } catch (error) {
@@ -167,13 +190,17 @@ const AdminPanel = () => {
         />
       ) : (
         <>
-          <Button onClick={switchToManagePanel} color={"white"}>
-          <GiJewelCrown />
+          <HStack justifyContent={"center"} alignItems={"center"}>
+            <Button
+              onClick={switchToManagePanel}
+              color={"white"}
+              justifyContent={"center"}
+              alignItems={"center"}
+            >
+              <GiJewelCrown /> Gerenciar
+            </Button>
+          </HStack>
 
-            Gerenciar
-          </Button>
-
-      
           <Text fontSize="xl" mb={4} fontWeight="bold">
             Cadastrar Joia
           </Text>
@@ -206,6 +233,12 @@ const AdminPanel = () => {
             onChange={(e) => setName(e.target.value)}
             mb={4}
           />
+          <Input
+            placeholder="Descrição da joia"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            mb={4}
+          />
 
           <Input
             placeholder="R$ 0,00"
@@ -215,15 +248,38 @@ const AdminPanel = () => {
           />
 
           <Box mb={4}>
+            {colorPalettes.map((colorPalette) => (
+              <Stack
+                align="center"
+                key={colorPalette}
+                direction="row"
+                gap="10"
+                width="full"
+              >
+                <Checkbox.Root
+                  defaultChecked
+                  colorPalette={colorPalette}
+                  mb={4}
+                  onChange={(e) =>
+                    setIsPromotion((e.target as HTMLInputElement).checked)
+                  }
+                >
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label> Produto de Promoção</Checkbox.Label>
+                </Checkbox.Root>
+              </Stack>
+            ))}
             <Select.Root
               collection={items}
-              onValueChange={({ value }) => {
-                setCategories(value[0]);
-              }}
+              onValueChange={({ value }) =>
+                setCategories(value as JewelCategory[])
+              }
               maxW="md"
               mx="auto"
               size="sm"
               width="320px"
+              multiple
             >
               <Select.HiddenSelect />
               <Select.Label>Selecione a Categoria</Select.Label>
@@ -248,7 +304,7 @@ const AdminPanel = () => {
                         key={item.value}
                         item={item}
                         _hover={{ bg: "#1c3050" }}
-                        _selected={{ color: "white" }}
+                        _selected={{ color: "black", bg: "#1c3050" }}
                         color="black"
                         justifyContent={"center"}
                         bg="#e8e2d2"
