@@ -29,10 +29,10 @@ const AdminPanel = () => {
   const [price, setPrice] = useState<string>("");
   const [categories, setCategories] = useState<JewelCategory[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
-  const [originalPrice, setOriginalPrice] = useState<string>(""); // Novo campo
+  const [originalPrice, setOriginalPrice] = useState<string>("");
   const [status, setStatus] = useState<UploadStatus>("idle");
-  const [isPromotion, setIsPromotion] = useState(false); // Novo estado
-  const [promotionTag, setPromotionTag] = useState(""); // Novo campo
+  const [isPromotion, setIsPromotion] = useState(false); 
+  const [promotionTag, setPromotionTag] = useState(""); 
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
@@ -93,9 +93,9 @@ const AdminPanel = () => {
         price,
         isPromotion ? [...categories, "Promoção" as JewelCategory] : categories,
         description,
-        isPromotion, // Novo parâmetro
-        isPromotion ? originalPrice : undefined, // Novo parâmetro
-        isPromotion ? promotionTag : undefined // Novo parâmetro
+        isPromotion, 
+        isPromotion ? originalPrice : "", 
+        isPromotion ? promotionTag : "" 
       );
       setStatus("success");
       setImage(null);
@@ -168,6 +168,14 @@ const AdminPanel = () => {
       return () => clearTimeout(timer);
     }
   }, [status]);
+  const handleOriginalPriceChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const rawValue = e.target.value;
+    const formattedValue = formatCurrency(rawValue);
+    setOriginalPrice(formattedValue);
+  };
+
   return (
     <Box p={4} maxW="md" mx="auto">
       {showForm ? (
@@ -246,6 +254,14 @@ const AdminPanel = () => {
             onChange={handleChange}
             mb={4}
           />
+          {isPromotion && (
+            <Input
+              placeholder="Preço original (ex: R$ 299,90)"
+              value={originalPrice}
+              onChange={handleOriginalPriceChange}
+              mb={4}
+            />
+          )}
 
           <Box mb={4}>
             {colorPalettes.map((colorPalette) => (
@@ -257,7 +273,6 @@ const AdminPanel = () => {
                 width="full"
               >
                 <Checkbox.Root
-                  defaultChecked
                   colorPalette={colorPalette}
                   mb={4}
                   onChange={(e) =>

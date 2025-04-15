@@ -5,16 +5,16 @@ export enum JewelCategory {
   Aneis = "Aneis",
   Brincos = "Brincos",
   Pingentes = "Pingentes",
-  Promoção = "Promoção"
+  Promoção = "Promoção",
 }
 export type Jewel = {
   id: string;
   name: string;
   price: string;
-  originalPrice?: string; // Novo campo para preço original
+  originalPrice?: string; 
   categories: JewelCategory[];
   description: string;
   imageBase64: string;
-  isPromotion?: boolean; // Novo campo para identificar promoções
-  promotionTag?: string; // Tag personalizada (ex: "50% OFF")
+  isPromotion?: boolean;
+  promotionTag?: string;
 };

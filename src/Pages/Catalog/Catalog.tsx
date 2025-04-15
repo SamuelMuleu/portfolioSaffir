@@ -137,17 +137,17 @@ const Catalog = () => {
                 rounded="lg"
                 _hover={{ transform: "scale(1.02)" }}
                 transition="all 0.2s"
-                borderColor={jewel.isPromotion ? "red.200" : "gray.200"}
+                borderColor={jewel.isPromotion ? "red.200" : "inherit"}
               >
                 {jewel.isPromotion && (
                   <Box
-                    position="absolute"
-                    top={2}
-                    right={2}
+                  position={"absolute"}
                     bg="red.500"
                     color="white"
                     px={2}
                     py={1}
+                    w={"100px"}
+       
                     borderRadius="md"
                     fontSize="xs"
                     fontWeight="bold"
@@ -162,7 +162,7 @@ const Catalog = () => {
                     else setSelectedJewel(null);
                   }}
                 >
-                  <Dialog.Trigger asChild>
+                  <Dialog.Trigger bg={"inherit"} _hover={{ bg: "inherit" }}>
                     <Image
                       src={jewel.imageBase64}
                       alt={jewel.name}
@@ -175,17 +175,6 @@ const Catalog = () => {
                       _hover={{ transform: "scale(1.05)" }}
                       transition="transform 0.2s"
                     />
-                    {jewel.isPromotion && (
-                      <Box
-                        position="absolute"
-                        top={0}
-                        left={0}
-                        right={0}
-                        bottom={0}
-                        bg="rgba(255,0,0,0.05)"
-                        borderRadius="md"
-                      />
-                    )}
                   </Dialog.Trigger>
                   <Portal>
                     <Dialog.Backdrop />
@@ -213,7 +202,7 @@ const Catalog = () => {
                                 src={selectedJewel.imageBase64}
                                 alt={selectedJewel.name}
                                 objectFit="contain"
-                                h={{ base: "70vh", md: "90vh" }}
+                                h={{ base: "70vh", md: "70vh" }}
                                 mt="-50px"
                                 w="100%"
                               />

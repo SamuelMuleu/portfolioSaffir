@@ -11,7 +11,6 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { deleteJewelry } from "../firebaseUpload";
-
 import { Jewel } from "@/types/Jewel";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
@@ -55,7 +54,6 @@ const ManageJewelries = ({
           id: doc.id,
           name: data.name || "",
           price: data.price || "",
-
           categories: Array.isArray(data.categories)
             ? data.categories
             : data.category
@@ -68,10 +66,12 @@ const ManageJewelries = ({
       setJewelries(jewels);
     } catch (error) {
       console.error("Erro ao carregar joias:", error);
+      alert("Erro ao carregar joias. Tente novamente mais tarde.");
     } finally {
       setLoading(false);
     }
   };
+
   const handleDelete = async (id: string) => {
     if (!window.confirm("Tem certeza que deseja excluir esta joia?")) return;
 
@@ -80,7 +80,8 @@ const ManageJewelries = ({
       await deleteJewelry(id);
       await loadJewelries();
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao excluir joia:", error);
+      alert("Erro ao excluir joia. Tente novamente mais tarde.");
     } finally {
       setDeletingId(null);
     }
@@ -94,6 +95,7 @@ const ManageJewelries = ({
   useEffect(() => {
     loadJewelries();
   }, []);
+
   const handleAddNew = () => {
     setEditingJewel(null);
     switchToUploadPanel();
@@ -114,7 +116,7 @@ const ManageJewelries = ({
 
         <InputGroup maxW="400px" startElement={<LuSearch />} mb={4}>
           <Input
-            placeholder="Buscar "
+            placeholder="Buscar joia"
             value={searchTerm}
             height="36px"
             borderRadius={"lg"}
@@ -182,15 +184,23 @@ const ManageJewelries = ({
               </Text>
 
               {jewel.categories.map((category) => (
-                <Box
+                <Flex
                   key={category}
                   borderRadius="md"
                   fontSize="xs"
+                  bg={category === "Promoção" ? "red.500" : "black"}
+                  mt={2}
+                  w="fit-content"
+                  p={1}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  color="white"
                   fontWeight="medium"
                 >
                   {category}
-                </Box>
+                </Flex>
               ))}
+
               <Flex mt={3} gap={2}>
                 <Button
                   size="sm"

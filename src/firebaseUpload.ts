@@ -1,6 +1,7 @@
 import { db } from "./firebaseConfig";
-import { collection, addDoc, doc, deleteDoc, updateDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, deleteDoc, updateDoc, getDocs} from "firebase/firestore";
 import { Jewel, JewelCategory } from "./types/Jewel";
+
 
 
 
@@ -20,15 +21,19 @@ export const uploadJewelry = async (
 
   const imageBase64 = await convertToBase64(file);
 
+
+  const formattedCategories = isPromotion
+  ? [...new Set([...categories, JewelCategory.Promoção])]
+  : categories.filter(c => c !== JewelCategory.Promoção);;
   const docRef = await addDoc(collection(db, "joias"), {
     name,
     price,
-    categories: isPromotion ? [...categories, "promocao"] : categories,
+    categories: formattedCategories,
     description,
     imageBase64,
-    isPromotion: isPromotion || false,
-    originalPrice: isPromotion ? originalPrice : null,
-    promotionTag: isPromotion ? promotionTag : null,
+    isPromotion,
+    originalPrice: isPromotion ? originalPrice : null, 
+    promotionTag: isPromotion ? promotionTag : null  
 
   });
 
@@ -36,12 +41,12 @@ export const uploadJewelry = async (
     id: docRef.id,
     name,
     price,
-    categories: isPromotion ? [...categories, "Promoção" as JewelCategory] : categories,
+    categories: formattedCategories,
     description,
     imageBase64,
     isPromotion: isPromotion || false,
-    originalPrice: isPromotion ? originalPrice : undefined,
-    promotionTag: isPromotion ? promotionTag : undefined,
+    originalPrice: isPromotion ? originalPrice : "",
+    promotionTag: isPromotion ? promotionTag : "",
 
   };
 };
@@ -75,19 +80,27 @@ export const updateJewelry = async (
     throw new Error("Nome, preço e categoria são obrigatórios");
   }
 
+  
   const jewelRef = doc(db, "joias", id);
   const updateData: Partial<Jewel> = {
     name: data.name,
     price: data.price,
     description: data.description,
     categories: data.categories,
-    isPromotion: data.isPromotion || false,
-    originalPrice: data.isPromotion ? data.originalPrice : undefined,
-    promotionTag: data.isPromotion ? data.promotionTag : undefined,
+
   };
 
-  if (data.image) {
-    updateData.imageBase64 = await convertToBase64(data.image);
+  if (data.isPromotion) {
+    updateData.isPromotion = true;
+    if (data.originalPrice !== undefined) {
+      updateData.originalPrice = data.originalPrice;
+    }
+    if (data.promotionTag !== undefined) {
+      updateData.promotionTag = data.promotionTag;
+    }
+  } else {
+    updateData.isPromotion = false;
+ 
   }
 
   try {
@@ -101,8 +114,8 @@ export const updateJewelry = async (
       description: data.description,
       imageBase64: updateData.imageBase64 || '',
       isPromotion: data.isPromotion || false,
-      originalPrice: data.isPromotion ? data.originalPrice : undefined,
-      promotionTag: data.isPromotion ? data.promotionTag : undefined,
+      originalPrice: data.isPromotion ? data.originalPrice : "",
+      promotionTag: data.isPromotion ? data.promotionTag : "",
     };
   } catch (error) {
     console.error("Erro ao atualizar joia:", error);
@@ -130,8 +143,8 @@ export const getJewelries = async (): Promise<Jewel[]> => {
       categories: doc.data().categories || [],
       imageBase64: doc.data().imageBase64,
       isPromotion: doc.data().isPromotion || false,
-      originalPrice: doc.data().originalPrice || undefined,
-      promotionTag: doc.data().promotionTag || undefined,
+      originalPrice: doc.data().originalPrice ?? "",
+      promotionTag: doc.data().promotionTag || "",
     }));
   } catch (error) {
     console.error("Erro ao buscar joias:", error);

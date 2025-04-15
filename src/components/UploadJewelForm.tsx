@@ -8,10 +8,13 @@ import {
   Alert,
   Flex,
   createListCollection,
+  Stack,
+  Checkbox,
 } from "@chakra-ui/react";
 import { updateJewelry, uploadJewelry } from "@/firebaseUpload";
 import { Select } from "@chakra-ui/react";
 import { Jewel, JewelCategory } from "@/types/Jewel";
+import { colorPalettes } from "@/compositions/lib/color-palettes";
 
 type UploadJewelFormProps = {
   editingJewel: Jewel | null;
@@ -32,6 +35,8 @@ const UploadJewelForm = ({
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<JewelCategory[]>([]);
+  const [isPromotion, setIsPromotion] = useState(false);
+  const [originalPrice, setOriginalPrice] = useState("");
 
   const formatCurrency = (value: string) => {
     let digits = value.replace(/\D/g, "");
@@ -58,13 +63,22 @@ const UploadJewelForm = ({
     setPrice(formattedValue);
   };
 
+  
   useEffect(() => {
     if (editingJewel) {
+      console.log("Dados completos da joia:", editingJewel);
       setName(editingJewel.name);
       setPrice(editingJewel.price);
       setCategories(editingJewel.categories);
       setDescription(editingJewel.description);
       setPreview(editingJewel.imageBase64);
+      setIsPromotion(
+        editingJewel.isPromotion || editingJewel.categories.includes("Promoção" as JewelCategory)
+      );
+
+      if (editingJewel.originalPrice) {
+        setOriginalPrice(editingJewel.originalPrice);
+      }
     } else {
       setName("");
       setPrice("");
@@ -72,6 +86,8 @@ const UploadJewelForm = ({
       setCategories([]);
       setPreview("");
       setImage(null);
+      setIsPromotion(false);
+      setOriginalPrice("");
     }
   }, [editingJewel]);
 
@@ -88,29 +104,62 @@ const UploadJewelForm = ({
     setPreview(URL.createObjectURL(file));
     setError("");
   };
+  const handleOriginalPriceChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const rawValue = e.target.value;
+    const unformatted = rawValue.replace(/\D/g, "");
 
+    if (unformatted === "") {
+      setOriginalPrice("");
+      return;
+    }
+
+    const formattedValue = formatCurrency(unformatted);
+    setOriginalPrice(formattedValue);
+  };
   const handleSubmit = async () => {
     if (!name || !description || categories.length === 0) {
       setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
+    if (isPromotion && !originalPrice) {
+      setError("Por favor, informe o preço original para promoções.");
+      return;
+    }
+
     setIsLoading(true);
+
     try {
       if (editingJewel) {
         await updateJewelry(editingJewel.id, {
           name,
           price,
-          categories,
+          categories: isPromotion
+            ? [...new Set([...categories, "Promoção" as JewelCategory])]
+            : categories.filter((cat) => cat !== "Promoção"),
           description,
           image: image || undefined,
+          isPromotion,
+          originalPrice: isPromotion ? originalPrice : undefined,
         });
       } else {
         if (!image) {
           setError("Por favor, selecione uma imagem.");
           return;
         }
-        await uploadJewelry(image, name, price, categories, description);
+        await uploadJewelry(
+          image,
+          name,
+          price,
+          isPromotion
+            ? [...new Set([...categories, "Promoção" as JewelCategory])]
+            : categories,
+          description,
+          isPromotion,
+          isPromotion ? originalPrice : undefined
+        );
       }
       onSuccess();
     } catch (err) {
@@ -165,7 +214,43 @@ const UploadJewelForm = ({
         onChange={handlePriceChange}
         mb={4}
       />
+      <Box mb={4}>
+        {colorPalettes.map((colorPalette) => (
+          <Stack
+            align="center"
+            key={colorPalette}
+            direction="row"
+            gap="10"
+            width="full"
+          >
+            <Checkbox.Root
+              checked={isPromotion}
+              colorPalette={colorPalette}
+              mb={4}
+              onChange={(e) => {
+                const checked = (e.target as HTMLInputElement).checked;
+                setIsPromotion(checked);
+                if (!checked) {
+                  setOriginalPrice("");
+                }
+              }}
+            >
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+              <Checkbox.Label> Produto de Promoção</Checkbox.Label>
+            </Checkbox.Root>
+          </Stack>
+        ))}
+      </Box>
 
+      {isPromotion && (
+        <Input
+          placeholder="Preço original (ex: R$ 299,90)"
+          value={originalPrice}
+          onChange={handleOriginalPriceChange}
+          mb={4}
+        />
+      )}
       <Select.Root
         size="sm"
         collection={items}
