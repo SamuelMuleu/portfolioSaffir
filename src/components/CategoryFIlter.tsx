@@ -1,9 +1,9 @@
 import { Button, Stack, Center } from "@chakra-ui/react";
 
-export const CategoryFilter = ({ 
+export const CategoryFilter = ({
   categories,
   selectedCategory,
-  onSelectCategory 
+  onSelectCategory
 }: {
   categories: string[];
   selectedCategory: string;
@@ -20,6 +20,9 @@ export const CategoryFilter = ({
           color={selectedCategory === category ? "white" : "gray.800"}
           textTransform="capitalize"
           fontSize={{ base: "sm", md: "md" }}
+          size={"sm"}
+          mx={{ base: "0", md: "-2", lg: "0" }}
+
           _hover={{
             bg: selectedCategory === category ? "#0e2d5b" : "#e8e2d2",
           }}

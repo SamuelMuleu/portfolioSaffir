@@ -50,6 +50,7 @@ export const uploadJewelry = async (
     promotionTag: isPromotion ? promotionTag : "",
 
   };
+  
 };
 
 export const deleteJewelry = async (id: string): Promise<void> => {

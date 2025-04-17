@@ -159,6 +159,16 @@ const Catalog = () => {
                     px={2}
                     py={1}
                     w={"100px"}
+                    ml={{
+                      base: "0",
+                      md: "10px",
+                      lg:"66px"
+                    }}
+                    mt={{
+                      base: "0",
+                      md: "70px",
+                      lg: "5px"
+                    }}
 
                     borderRadius="md"
                     fontSize="xs"
