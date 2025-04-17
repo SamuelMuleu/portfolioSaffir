@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import {
   Box,
@@ -30,8 +30,6 @@ const Catalog = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-
-
     const unsubscribe = onSnapshot(
       collection(db, "joias"),
       (querySnapshot) => {
@@ -110,7 +108,13 @@ const Catalog = () => {
 
   return (
     <Box mb={8}>
-      <Box display="flex" justifyContent={"center"} alignItems={"center"} px={4} mb={4}>
+      <Box
+        display="flex"
+        justifyContent={"center"}
+        alignItems={"center"}
+        px={4}
+        mb={4}
+      >
         <CategoryFilter
           categories={dynamicCategories}
           selectedCategory={selectedCategory}
@@ -127,7 +131,14 @@ const Catalog = () => {
         </Center>
       ) : (
         <>
-          <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(3, 1fr)", lg: "repeat(4, 1fr)" }} gap={6}>
+          <Grid
+            templateColumns={{
+              base: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            }}
+            gap={6}
+          >
             {paginatedJewels.map((jewel) => (
               <Box
                 key={jewel.id}
@@ -138,16 +149,28 @@ const Catalog = () => {
                 borderColor={jewel.isPromotion ? "red.200" : "inherit"}
               >
                 {jewel.isPromotion && (
-                  <Box position={"absolute"} bg="red.500" color="white" px={2} py={1} w={"100px"} ml={{
-                    base: "0",
-                    md: "5px",
-                    lg: "66px"
-                  }}
+                  <Box
+                    position={"absolute"}
+                    bg="red.500"
+                    color="white"
+                    px={2}
+                    py={1}
+                    w={"100px"}
+                    ml={{
+                      base: "0",
+                      md: "5px",
+                      lg: "26px",
+                    }}
                     mt={{
                       base: "0",
                       md: "68px",
-                      lg: "5px"
-                    }} borderRadius="md" fontSize="xs" fontWeight="bold" zIndex={1}>
+                      lg: "5px",
+                    }}
+                    borderRadius="md"
+                    fontSize="xs"
+                    fontWeight="bold"
+                    zIndex={1}
+                  >
                     {jewel.promotionTag || "PROMOÇÃO"}
                   </Box>
                 )}
@@ -165,7 +188,7 @@ const Catalog = () => {
                         objectFit="contain"
                         rounded="xs"
                         w={{ base: "100%", md: "300px" }}
-                        h={{ base: "100%", md: "400px" }}
+                        maxH={{ base: "100%", md: "350px" }}
                         mx="auto"
                         loading="lazy"
                         cursor="pointer"
@@ -179,9 +202,18 @@ const Catalog = () => {
                     <Dialog.Positioner>
                       <Dialog.Content bg="#e8e2d2" maxW="90vw" mt="10px" p={4}>
                         <Dialog.Header>
-                          <Dialog.Title color="#1c3050" fontWeight={"bold"}></Dialog.Title>
+                          <Dialog.Title
+                            color="#1c3050"
+                            fontWeight={"bold"}
+                          ></Dialog.Title>
                           <Dialog.CloseTrigger asChild>
-                            <CloseButton position="absolute" right="8px" top="8px" fontWeight={"bold"} color="white" />
+                            <CloseButton
+                              position="absolute"
+                              right="8px"
+                              top="8px"
+                              fontWeight={"bold"}
+                              color="white"
+                            />
                           </Dialog.CloseTrigger>
                         </Dialog.Header>
                         <Dialog.Body>
@@ -195,22 +227,40 @@ const Catalog = () => {
                                 mt="-50px"
                                 w="100%"
                               />
-                              {selectedJewel.isPromotion && selectedJewel.originalPrice ? (
+                              {selectedJewel.isPromotion &&
+                              selectedJewel.originalPrice ? (
                                 <Box alignItems="center" gap={2} mb={1}>
-                                  <Text color="red.500" fontWeight="bold" fontSize="lg">
+                                  <Text
+                                    color="red.500"
+                                    fontWeight="bold"
+                                    fontSize="lg"
+                                  >
                                     {selectedJewel.price}
                                   </Text>
-                                  <Text color="gray.500" textDecoration="line-through" fontSize="sm">
+                                  <Text
+                                    color="gray.500"
+                                    textDecoration="line-through"
+                                    fontSize="sm"
+                                  >
                                     {selectedJewel.originalPrice}
                                   </Text>
                                 </Box>
                               ) : (
-                                <Text color="blue.600" fontWeight="medium" mb={1}>
+                                <Text
+                                  color="blue.600"
+                                  fontWeight="medium"
+                                  mb={1}
+                                >
                                   {selectedJewel.price}
                                 </Text>
                               )}
                               <Box mt={4} p={4}>
-                                <Text fontSize="md" color="gray.700" lineHeight="tall" whiteSpace="pre-line">
+                                <Text
+                                  fontSize="md"
+                                  color="gray.700"
+                                  lineHeight="tall"
+                                  whiteSpace="pre-line"
+                                >
                                   Descrição:
                                 </Text>
                                 <Text mt={2}>{selectedJewel.description}</Text>
@@ -242,16 +292,24 @@ const Catalog = () => {
                 <LuChevronLeft />
               </IconButton>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button key={page} variant={currentPage === page ? "solid" : "outline"} onClick={() => setCurrentPage(page)}>
-                  {page}
-                </Button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "solid" : "outline"}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
 
               <IconButton
                 aria-label="Próxima página"
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
               >
                 <LuChevronRight />
               </IconButton>
