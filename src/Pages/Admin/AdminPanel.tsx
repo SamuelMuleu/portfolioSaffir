@@ -205,7 +205,8 @@
                 color={"white"}
                 justifyContent={"center"}
                 alignItems={"center"}
-              >
+                bg={"#102c5b"}
+                >
                 <GiJewelCrown /> Gerenciar
               </Button>
             </HStack>
@@ -296,14 +297,16 @@
                 size="sm"
                 width="320px"
                 multiple
+                
               >
                 <Select.HiddenSelect />
-                <Select.Label>Selecione a Categoria</Select.Label>
+       
                 <Select.Control>
                   <Select.Trigger>
                     <Select.ValueText
                       maxW="md"
                       mx="auto"
+                      bg={"#102c5b"}
                       placeholder="Selecione a Categoria"
                       color={"white"}
                     />
@@ -366,6 +369,7 @@
               loadingText="Enviando..."
               width="full"
               disabled={!image || !name}
+              bg={"#102c5b"}
             >
               Upload Joia
             </Button>

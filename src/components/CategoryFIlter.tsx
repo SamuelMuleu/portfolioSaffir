@@ -21,7 +21,7 @@ export const CategoryFilter = ({
           textTransform="capitalize"
           fontSize={{ base: "sm", md: "md" }}
           size={"sm"}
-          mx={{ base: "0", md: "-2", lg: "0" }}
+          mx={{ base: "0", md: "-1", lg: "0" }}
 
           _hover={{
             bg: selectedCategory === category ? "#0e2d5b" : "#e8e2d2",
