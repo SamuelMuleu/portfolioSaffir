@@ -106,24 +106,25 @@ const Catalog = () => {
   }
 
   return (
-    <Box mb={8}>
-      <Box 
-      display="flex" 
-      justifyContent={"center"} 
-      alignItems={"center"}
-
+    <Box mb={8} >
+      <Box
+        display="flex"
+        justifyContent={"center"}
+        alignItems={"center"}
+        px={4}
+        mb={4}
       >
 
-      <CategoryFilter
-      
-        categories={dynamicCategories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={(cat) => {
-          setSelectedCategory(cat);
-          setCurrentPage(1);
-        }}
-        
-      />
+        <CategoryFilter
+
+          categories={dynamicCategories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={(cat) => {
+            setSelectedCategory(cat);
+            setCurrentPage(1);
+          }}
+
+        />
       </Box>
 
       {paginatedJewels.length === 0 ? (
@@ -148,17 +149,17 @@ const Catalog = () => {
                 _hover={{ transform: "scale(1.02)" }}
                 transition="all 0.2s"
                 borderColor={jewel.isPromotion ? "red.200" : "inherit"}
-          
+
               >
                 {jewel.isPromotion && (
                   <Box
-                  position={"absolute"}
+                    position={"absolute"}
                     bg="red.500"
                     color="white"
                     px={2}
                     py={1}
                     w={"100px"}
-       
+
                     borderRadius="md"
                     fontSize="xs"
                     fontWeight="bold"
@@ -172,21 +173,24 @@ const Catalog = () => {
                     if (isOpen) setSelectedJewel(jewel);
                     else setSelectedJewel(null);
                   }}
+
                 >
-                  <Dialog.Trigger bg={"inherit"} _hover={{ bg: "inherit" }}>
-                    <Image
-                      src={jewel.imageBase64}
-                      alt={jewel.name}
-                      objectFit="contain"
-                      rounded="xs"
-                      w={{ base: "10rem", md: "300px" }}
-                      h={{ base: "10rem", md: "400px" }}
-                      mx="auto"
-                      loading="lazy"
-                      cursor="pointer"
-                      _hover={{ transform: "scale(1.05)" }}
-                      transition="transform 0.2s"
-                    />
+                  <Dialog.Trigger asChild>
+                    <Box>
+                      <Image
+                        src={jewel.imageBase64}
+                        alt={jewel.name}
+                        objectFit="contain"
+                        rounded="xs"
+                        w={{ base: "100%", md: "300px" }}
+                        h={{ base: "100%", md: "400px" }}
+                        mx="auto"
+                        loading="lazy"
+                        cursor="pointer"
+                        transition="transform 0.2s"
+                        _hover={{ transform: "scale(1.05)" }}
+                      />
+                    </Box>
                   </Dialog.Trigger>
                   <Portal>
                     <Dialog.Backdrop />
@@ -217,6 +221,7 @@ const Catalog = () => {
                                 h={{ base: "70vh", md: "70vh" }}
                                 mt="-50px"
                                 w="100%"
+
                               />
                               {jewel.isPromotion && jewel.originalPrice ? (
                                 <Box alignItems="center" gap={2} mb={1}>
