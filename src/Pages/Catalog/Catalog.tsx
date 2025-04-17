@@ -106,15 +106,25 @@ const Catalog = () => {
   }
 
   return (
-    <Box mb={8} display="flex" flexWrap="wrap" gap={1} justifyContent="center">
+    <Box mb={8}>
+      <Box 
+      display="flex" 
+      justifyContent={"center"} 
+      alignItems={"center"}
+
+      >
+
       <CategoryFilter
+      
         categories={dynamicCategories}
         selectedCategory={selectedCategory}
         onSelectCategory={(cat) => {
           setSelectedCategory(cat);
           setCurrentPage(1);
         }}
+        
       />
+      </Box>
 
       {paginatedJewels.length === 0 ? (
         <Center h="200px">
@@ -138,6 +148,7 @@ const Catalog = () => {
                 _hover={{ transform: "scale(1.02)" }}
                 transition="all 0.2s"
                 borderColor={jewel.isPromotion ? "red.200" : "inherit"}
+          
               >
                 {jewel.isPromotion && (
                   <Box
@@ -169,6 +180,7 @@ const Catalog = () => {
                       objectFit="contain"
                       rounded="xs"
                       w={{ base: "10rem", md: "300px" }}
+                      h={{ base: "10rem", md: "400px" }}
                       mx="auto"
                       loading="lazy"
                       cursor="pointer"

@@ -5,6 +5,7 @@ import { Jewel, JewelCategory } from "./types/Jewel";
 
 
 
+
 export const uploadJewelry = async (
   file: File,
   name: string,
@@ -122,16 +123,58 @@ export const updateJewelry = async (
     throw new Error("Falha ao atualizar joia");
   }
 };
-// Função auxiliar para converter arquivo para Base64
 const convertToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
+    reader.onload = () => {
+      const base64Image = reader.result as string;
+
+      // Verifique o tamanho do base64 (por exemplo, 1MB é 1048576 bytes)
+      if (base64Image.length > 1048487) { // Aproximadamente 1MB
+        // Se a imagem for muito grande, compressa ela para reduzir o tamanho
+        compressImage(file)
+          .then((compressedBase64) => resolve(compressedBase64))
+          .catch(reject);
+      } else {
+        resolve(base64Image);
+      }
+    };
+    reader.onerror = (error) => reject(error);
   });
 };
 
+// Função de compressão usando Canvas
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    
+    reader.onload = () => {
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    
+    img.onload = () => {
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      
+      const MAX_WIDTH = 800; 
+      const scaleSize = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scaleSize;
+      
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7); 
+
+      resolve(compressedBase64);
+    };
+    
+    img.onerror = (error) => reject(error);
+  });
+};
 export const getJewelries = async (): Promise<Jewel[]> => {
   try {
     const querySnapshot = await getDocs(collection(db, "joias"));
