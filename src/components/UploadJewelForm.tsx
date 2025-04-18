@@ -15,6 +15,7 @@ import { updateJewelry, uploadJewelry } from "@/firebaseUpload";
 import { Select } from "@chakra-ui/react";
 import { Jewel, JewelCategory } from "@/types/Jewel";
 import { colorPalettes } from "@/compositions/lib/color-palettes";
+import { useJewel } from "@/context/JewelContext";
 
 type UploadJewelFormProps = {
   editingJewel: Jewel | null;
@@ -27,16 +28,29 @@ const UploadJewelForm = ({
   onSuccess,
   onCancel,
 }: UploadJewelFormProps) => {
-  const [image, setImage] = useState<File | null>(null);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+
   const [preview, setPreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [description, setDescription] = useState("");
+
   const [error, setError] = useState("");
-  const [categories, setCategories] = useState<JewelCategory[]>([]);
-  const [isPromotion, setIsPromotion] = useState(false);
-  const [originalPrice, setOriginalPrice] = useState("");
+
+
+  const {
+    name,
+    setName,
+    price,
+    setPrice,
+    image,
+    setImage,
+    categories,
+    setCategories,
+    description,
+    setDescription,
+    originalPrice,
+    setOriginalPrice,
+    isPromotion,
+    setIsPromotion,
+  } = useJewel();
 
   const formatCurrency = (value: string) => {
     let digits = value.replace(/\D/g, "");
@@ -63,7 +77,7 @@ const UploadJewelForm = ({
     setPrice(formattedValue);
   };
 
-  
+
   useEffect(() => {
     if (editingJewel) {
       console.log("Dados completos da joia:", editingJewel);
@@ -76,11 +90,10 @@ const UploadJewelForm = ({
         editingJewel.isPromotion || editingJewel.categories.includes("Promoção" as JewelCategory)
       );
 
-      if (editingJewel.originalPrice) {
-        setOriginalPrice(editingJewel.originalPrice);
-      }
+        setOriginalPrice(editingJewel.originalPrice || "");
+  
     } else {
-      setName("");
+
       setPrice("");
       setDescription("");
       setCategories([]);
@@ -119,7 +132,7 @@ const UploadJewelForm = ({
     setOriginalPrice(formattedValue);
   };
   const handleSubmit = async () => {
-    if (!name || !description || categories.length === 0) {
+    if (!name || !description || !categories) {
       setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -173,7 +186,7 @@ const UploadJewelForm = ({
     items: [
       { label: "Correntaria", value: "correntaria" },
       { label: "Conjuntos", value: "conjuntos" },
-      { label: "Alianças", value: "aliancas" },
+      { label: "Alianças", value: "alianças" },
       { label: "Aneis", value: "aneis" },
       { label: "Brincos", value: "brincos" },
     ],
@@ -265,7 +278,7 @@ const UploadJewelForm = ({
           <Select.Trigger>
             <Select.ValueText
               placeholder={
-                categories.length > 0
+                categories
                   ? categories.join(", ")
                   : "Selecione as categorias"
               }

@@ -7,17 +7,14 @@ import {
   Text,
   Spinner,
   Center,
-  Button,
   Grid,
-  IconButton,
-  ButtonGroup,
   CloseButton,
   Dialog,
   Portal,
 } from "@chakra-ui/react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { Jewel, JewelCategory } from "@/types/Jewel";
 import { CategoryFilter } from "@/components/CategoryFIlter";
+import { PaginationControls } from "@/components/PaginationControls";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -228,7 +225,7 @@ const Catalog = () => {
                                 w="100%"
                               />
                               {selectedJewel.isPromotion &&
-                              selectedJewel.originalPrice ? (
+                                selectedJewel.originalPrice ? (
                                 <Box alignItems="center" gap={2} mb={1}>
                                   <Text
                                     color="red.500"
@@ -281,40 +278,7 @@ const Catalog = () => {
               </Box>
             ))}
           </Grid>
-
-          <Center mt={8}>
-            <ButtonGroup>
-              <IconButton
-                aria-label="Página anterior"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                <LuChevronLeft />
-              </IconButton>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "solid" : "outline"}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </Button>
-                )
-              )}
-
-              <IconButton
-                aria-label="Próxima página"
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-              >
-                <LuChevronRight />
-              </IconButton>
-            </ButtonGroup>
-          </Center>
+          <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={(newPage) => setCurrentPage(newPage)} />
         </>
       )}
     </Box>

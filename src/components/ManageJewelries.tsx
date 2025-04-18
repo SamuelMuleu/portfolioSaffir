@@ -59,7 +59,8 @@ const ManageJewelries = ({
             : data.category
             ? [data.category]
             : [],
-          description: data.description || "",
+            originalPrice: data.originalPrice,
+            description: data.description || "",
           imageBase64: data.imageBase64 || "",
         } as Jewel;
       });

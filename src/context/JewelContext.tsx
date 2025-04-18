@@ -1,55 +1,81 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
-import { Jewel } from "@/types/Jewel";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { Jewel, JewelCategory } from "@/types/Jewel";  // Certifique-se de importar o tipo Jewel corretamente
 
-export interface JewelContextType {
+interface JewelContextType {
   jewels: Jewel[];
-  selectedJewel: Jewel | null;
-  setSelectedJewel: (jewel: Jewel | null) => void;
+  setJewels: (jewels: Jewel[]) => void;
+  image: File | null;
+  setImage: (image: File | null) => void;
+  name: string;
+  setName: (value: string) => void;
+  price: string;
+  setPrice: (price: string) => void;
+  categories: JewelCategory[];
+  setCategories: (categories: JewelCategory[]) => void;
+  description: string;
+  setDescription: (description: string) => void;
+  originalPrice: string;
+  setOriginalPrice: (price: string) => void;
+  isPromotion: boolean;
+  setIsPromotion: (value: boolean) => void;
+
+  promotionTag: string;
+  setPromotionTag: (value: string) => void;
   addJewel: (jewel: Jewel) => void;
   removeJewel: (id: string) => void;
 }
 
-export const JewelContext = createContext<JewelContextType>({} as JewelContextType);
+export const JewelContext = createContext<JewelContextType | undefined>(undefined);
 
-export const useJewel = () => useContext(JewelContext);
-
-type JewelProviderProps = {
-  children: ReactNode;
+export const useJewel = () => {
+  const context = useContext(JewelContext);
+  if (!context) {
+    throw new Error("useJewel deve ser usado dentro de JewelProvider");
+  }
+  return context;
 };
 
-export const JewelProvider = ({ children }: JewelProviderProps) => {
+export const JewelProvider = ({ children }: { children: ReactNode }) => {
   const [jewels, setJewels] = useState<Jewel[]>([]);
-  const [selectedJewel, setSelectedJewel] = useState<Jewel | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "joias"), (snapshot) => {
-      const jewelData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Jewel[];
-
-      setJewels(jewelData);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const [image, setImage] = useState<File | null>(null);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [categories, setCategories] = useState<JewelCategory[]>([]);
+  const [description, setDescription] = useState("");
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [isPromotion, setIsPromotion] = useState(false);
+  const [promotionTag, setPromotionTag] = useState("");
 
   const addJewel = (jewel: Jewel) => {
-    setJewels((prev) => [...prev, jewel]);
+    setJewels((prevJewels) => [...prevJewels, jewel]);
   };
 
   const removeJewel = (id: string) => {
-    setJewels((prev) => prev.filter((jewel) => jewel.id !== id));
+    setJewels((prevJewels) => prevJewels.filter((jewel) => jewel.id !== id));
   };
 
   return (
     <JewelContext.Provider
       value={{
         jewels,
-        selectedJewel,
-        setSelectedJewel,
+        setJewels,
+        image,
+        setImage,
+        name,
+        setName,
+        price,
+        setPrice,
+        categories,
+        setCategories,
+        description,
+        setDescription,
+        originalPrice,
+        setOriginalPrice,
+    
+        isPromotion,
+        setIsPromotion,
+        promotionTag,
+        setPromotionTag,
         addJewel,
         removeJewel,
       }}

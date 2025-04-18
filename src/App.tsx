@@ -4,7 +4,7 @@ import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
 import logo from "./assets/logo.png";
 import Footer from "./components/Footer";
-import JewelProvider from "./context/JewelProvider";
+import {JewelProvider} from "@/context/JewelProvider";
 
 
 function App() {
