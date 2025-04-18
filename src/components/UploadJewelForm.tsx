@@ -93,7 +93,7 @@ const UploadJewelForm = ({
         setOriginalPrice(editingJewel.originalPrice || "");
   
     } else {
-
+      setName("");
       setPrice("");
       setDescription("");
       setCategories([]);
