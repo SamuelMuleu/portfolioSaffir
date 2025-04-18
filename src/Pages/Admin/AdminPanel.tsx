@@ -134,6 +134,27 @@ const AdminPanel = () => {
     }
   };
 
+  const resetForm = () => {
+    setName("");
+    setPrice("");
+    setDescription("");
+    setCategories([]);
+    setPreview("");
+    setImage(null);
+    setIsPromotion(false);
+    setOriginalPrice("");
+    
+  };
+  
+
+  useEffect(() => {
+    if (editingJewel) {
+    
+    } else {
+      resetForm();
+    }
+  }, [editingJewel]);
+
   useEffect(() => {
           console.log(name)
     return () => {
