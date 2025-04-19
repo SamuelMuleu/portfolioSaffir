@@ -11,26 +11,22 @@ import {
   Stack,
   Checkbox,
 } from "@chakra-ui/react";
-import { updateJewelry, uploadJewelry } from "@/firebaseUpload";
+import {
+  fetchJewelryById,
+  updateJewelry,
+  uploadJewelry,
+} from "@/firebaseUpload";
 import { Select } from "@chakra-ui/react";
 import { Jewel, JewelCategory } from "@/types/Jewel";
 import { colorPalettes } from "@/compositions/lib/color-palettes";
 import { useJewel } from "@/context/JewelContext";
+import { useNavigate, useParams } from "react-router-dom";
 
-type UploadJewelFormProps = {
-  editingJewel: Jewel | null;
-  onSuccess: () => void;
-  onCancel: () => void;
-};
 
-const UploadJewelForm = ({
-  editingJewel,
-  onSuccess,
-  onCancel,
-}: UploadJewelFormProps) => {
+export const UploadJewelForm = () => {
   const [preview, setPreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [editingJewel, setEditingJewel] = useState<Jewel | null>(null);
   const [error, setError] = useState("");
 
   const {
@@ -49,7 +45,8 @@ const UploadJewelForm = ({
     isPromotion,
     setIsPromotion,
   } = useJewel();
-
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const formatCurrency = (value: string) => {
     let digits = value.replace(/\D/g, "");
     digits = digits.padStart(3, "0");
@@ -74,6 +71,21 @@ const UploadJewelForm = ({
     const formattedValue = formatCurrency(unformatted);
     setPrice(formattedValue);
   };
+  useEffect(() => {
+    if (id) {
+      console.log("ID da joia:", id);
+      const fetchData = async () => {
+        try {
+          const jewel = await fetchJewelryById(id);
+          setEditingJewel(jewel);
+        } catch (err) {
+          console.error("Erro ao buscar joia:", err);
+          setError("Erro ao carregar os dados da joia.");
+        }
+      };
+      fetchData();
+    }
+  }, [id]);
 
   useEffect(() => {
     if (editingJewel) {
@@ -174,7 +186,7 @@ const UploadJewelForm = ({
           isPromotion ? originalPrice : undefined
         );
       }
-      onSuccess();
+      navigate("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ocorreu um erro");
     } finally {
@@ -195,9 +207,12 @@ const UploadJewelForm = ({
   const handleCategoryChange = (value: string[]) => {
     setCategories(value as JewelCategory[]);
   };
+  const handleCancel = () => {
+    navigate(-1);
+  }
 
   return (
-    <Box>
+    <Box  maxW="400px" mx="auto"  p={4}>
       <Box
         display={"flex"}
         mt={2}
@@ -335,11 +350,11 @@ const UploadJewelForm = ({
 
       <Flex gap={2}>
         <Button onClick={handleSubmit} flex={1} loading={isLoading}>
-          {editingJewel ? "Atualizar" : "Cadastrar"}
+          {id ? "Atualizar" : "Atualizar"}
         </Button>
 
         {editingJewel && (
-          <Button onClick={onCancel} flex={1}>
+          <Button onClick={handleCancel} flex={1}>
             Cancelar
           </Button>
         )}

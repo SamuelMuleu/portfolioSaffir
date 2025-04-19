@@ -18,6 +18,7 @@ import { LuSearch } from "react-icons/lu";
 import { auth } from "@/firebaseConfig";
 import { signOut } from "firebase/auth";
 import { IoLogOut } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 type ManageJewelriesProps = {
   switchToUploadPanel: () => void;
@@ -27,7 +28,7 @@ type ManageJewelriesProps = {
 
 const ManageJewelries = ({
   switchToUploadPanel,
-  switchToUploadForm,
+
   setEditingJewel,
 }: ManageJewelriesProps) => {
   const [jewelries, setJewelries] = useState<Jewel[]>([]);
@@ -89,11 +90,6 @@ const ManageJewelries = ({
     } finally {
       setDeletingId(null);
     }
-  };
-
-  const handleEdit = (jewel: Jewel) => {
-    setEditingJewel(jewel);
-    switchToUploadForm();
   };
 
   useEffect(() => {
@@ -224,14 +220,11 @@ const ManageJewelries = ({
               ))}
 
               <Flex mt={3} gap={2}>
-                <Button
-                  size="sm"
-                  onClick={() => handleEdit(jewel)}
-                  flex={1}
-                  variant="outline"
-                >
-                  Editar
-                </Button>
+                <Link to={`/admin/jewel/${jewel.id}`}>
+                  <Button size="sm" flex={1} variant="outline">
+                    Editar
+                  </Button>
+                </Link>
                 <Button
                   size="sm"
                   color={"red.400"}

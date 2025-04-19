@@ -6,8 +6,10 @@ import {
   deleteDoc,
   updateDoc,
   getDocs,
+  getDoc,
 } from "firebase/firestore";
 import { Jewel, JewelCategory } from "./types/Jewel";
+
 
 export const uploadJewelry = async (
   file: File,
@@ -136,6 +138,22 @@ export const updateJewelry = async (
   } catch (error) {
     console.error("Erro ao atualizar joia:", error);
     throw new Error("Falha ao atualizar joia");
+  }
+};
+
+export const fetchJewelryById = async (id: string): Promise<Jewel> => {
+  try {
+    const docRef = doc(db, "joias", id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      throw new Error("Joia não encontrada");
+    }
+
+    return { id: docSnap.id, ...docSnap.data() } as Jewel;
+  } catch (err) {
+    console.error("Erro ao buscar joia:", err);
+    throw new Error("Erro ao buscar a joia");
   }
 };
 

@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import { JewelProvider } from "@/context/JewelProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { motion } from "framer-motion";
+import {UploadJewelForm} from "./components/UploadJewelForm";
 
 function App() {
   const MotionBox = motion(Box);
@@ -49,7 +50,7 @@ function App() {
               path="/admin/jewel/:id"
               element={
                 <ProtectedRoute>
-                  <AdminPanel />
+                  <UploadJewelForm  />
                 </ProtectedRoute>
               }
             />

@@ -55,7 +55,7 @@ export default function Login() {
   }
 
   return (
-    <Box maxW="400px" mx="auto" mt={20} p={4}>
+    <Box maxW="400px" mx="auto"   p={4}>
       <VStack as="form" onSubmit={handleLogin}>
         <Heading size="lg">Acesso Administrativo</Heading>
 

@@ -52,6 +52,7 @@ const AdminPanel = () => {
   const [showManagePanel, setShowManagePanel] = useState(false);
 
   const [editingJewel, setEditingJewel] = useState<Jewel | null>(null);
+
   const [showForm, setShowForm] = useState(false);
 
   const switchToManagePanel = () => {
@@ -212,15 +213,7 @@ const AdminPanel = () => {
     <Box p={4} maxW="md" mx="auto">
       {showForm ? (
         <UploadJewelForm
-          editingJewel={editingJewel}
-          onSuccess={() => {
-            setShowForm(false);
-            setEditingJewel(null);
-          }}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingJewel(null);
-          }}
+
         />
       ) : showManagePanel ? (
         <ManageJewelries
@@ -242,7 +235,12 @@ const AdminPanel = () => {
             </Button>
           </HStack>
 
-          <Box display={"flex"} mt={2} justifyContent={"center"} alignItems={"center"}>
+          <Box
+            display={"flex"}
+            mt={2}
+            justifyContent={"center"}
+            alignItems={"center"}
+          >
             <Text fontSize="xl" mb={4} fontWeight="bold">
               Cadastrar Joia
             </Text>
