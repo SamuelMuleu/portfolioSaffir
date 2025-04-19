@@ -7,14 +7,21 @@ import logo from "./assets/logo.png";
 import Footer from "./components/Footer";
 import { JewelProvider } from "@/context/JewelProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { motion } from "framer-motion";
 
 function App() {
+  const MotionBox = motion(Box);
   return (
     <JewelProvider>
       <Router>
         <Center>
-          <Box textAlign="center" width="98vw">
-            <Heading mb={4}>
+            <MotionBox
+   
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9 }}
+            >
+          <Heading mb={4}>
               <Image
                 src={logo}
                 alt="logo"
@@ -24,26 +31,31 @@ function App() {
                 loading="lazy"
                 width="100vw"
               />
-            </Heading>
+          </Heading>
 
-            <Routes>
-              <Route path="/" element={<Catalog />} />
-              <Route path="/login" element={<Login />} />
-              
-              <Route path="/admin/dashboard" element={
+
+          <Routes>
+            <Route path="/" element={<Catalog />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin/dashboard"
+              element={
                 <ProtectedRoute>
                   <AdminPanel />
                 </ProtectedRoute>
-              } />
-              
-              <Route path="/admin/jewel/:id" element={
+              }
+            />
+            <Route
+              path="/admin/jewel/:id"
+              element={
                 <ProtectedRoute>
                   <AdminPanel />
                 </ProtectedRoute>
-              } />
-            </Routes>
-            <Footer />
-          </Box>
+              }
+            />
+          </Routes>
+          <Footer />
+          </MotionBox>
         </Center>
       </Router>
     </JewelProvider>

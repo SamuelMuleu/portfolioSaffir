@@ -152,7 +152,7 @@ const UploadJewelForm = ({
             ? [...new Set([...categories, "Promoção" as JewelCategory])]
             : categories.filter((cat) => cat !== "Promoção"),
           description,
-       
+
           image: image || undefined,
           isPromotion,
           originalPrice: isPromotion ? originalPrice : undefined,
@@ -198,10 +198,16 @@ const UploadJewelForm = ({
 
   return (
     <Box>
-      <Text fontSize="lg" mb={4} fontWeight="bold">
-        {editingJewel ? "Editar Joia" : "Cadastrar Nova Joia"}
-      </Text>
-
+      <Box
+        display={"flex"}
+        mt={2}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <Text fontSize="xl" mb={4} fontWeight="bold">
+          Editar Joia
+        </Text>
+      </Box>
       {error && (
         <Alert.Root status="info" title="Error">
           <Alert.Indicator />

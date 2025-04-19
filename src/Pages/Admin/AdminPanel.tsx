@@ -24,7 +24,6 @@ import { colorPalettes } from "../../compositions/lib/color-palettes";
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 import { useJewel } from "@/context/JewelContext";
 
-
 const AdminPanel = () => {
   const {
     name,
@@ -231,23 +230,23 @@ const AdminPanel = () => {
         />
       ) : (
         <>
-           
-            <HStack justifyContent={"center"} alignItems={"center"}>
-              <Button
-                onClick={switchToManagePanel}
-                color={"white"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                bg={"#102c5b"}
-              >
-                <GiJewelCrown /> Gerenciar
-              </Button>
-            </HStack>
-      
+          <HStack justifyContent={"center"} alignItems={"center"}>
+            <Button
+              onClick={switchToManagePanel}
+              color={"white"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              bg={"#102c5b"}
+            >
+              <GiJewelCrown /> Gerenciar
+            </Button>
+          </HStack>
 
-          <Text fontSize="xl" mb={4} fontWeight="bold">
-            Cadastrar Joia
-          </Text>
+          <Box display={"flex"} mt={2} justifyContent={"center"} alignItems={"center"}>
+            <Text fontSize="xl" mb={4} fontWeight="bold">
+              Cadastrar Joia
+            </Text>
+          </Box>
 
           {status === "success" && (
             <Stack gap={4}>

@@ -122,7 +122,7 @@ const ManageJewelries = ({
           justifyContent={"center"}
           alignItems={"center"}
           mb={4}
-        gap={4}
+          gap={4}
         >
           <Button onClick={handleAddNew} size="sm">
             Adicionar Nova Joia
@@ -133,18 +133,20 @@ const ManageJewelries = ({
           </Button>
         </Box>
 
-        <InputGroup maxW="400px" startElement={<LuSearch />} mb={4}>
-          <Input
-            placeholder="Buscar joias"
-            value={searchTerm}
-            height="36px"
-            w="150px"
-            borderRadius={"lg"}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchTerm(e.target.value)
-            }
-          />
-        </InputGroup>
+        <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
+          <InputGroup maxW="400px" startElement={<LuSearch />} mb={4}>
+            <Input
+              placeholder="Buscar joias"
+              value={searchTerm}
+              height="36px"
+              w="150px"
+              borderRadius={"lg"}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
+            />
+          </InputGroup>
+        </Box>
       </Flex>
 
       {loading ? (

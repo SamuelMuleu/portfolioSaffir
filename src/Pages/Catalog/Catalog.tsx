@@ -15,6 +15,7 @@ import {
 import { Jewel, JewelCategory } from "@/types/Jewel";
 import { CategoryFilter } from "@/components/CategoryFIlter";
 import { PaginationControls } from "@/components/PaginationControls";
+import { motion } from "framer-motion";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -25,6 +26,8 @@ const Catalog = () => {
   const [selectedJewel, setSelectedJewel] = useState<Jewel | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const MotionBox = motion(Box);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -146,30 +149,36 @@ const Catalog = () => {
                 borderColor={jewel.isPromotion ? "red.200" : "inherit"}
               >
                 {jewel.isPromotion && (
-                  <Box
-                    position={"absolute"}
-                    bg="red.500"
-                    color="white"
-                    px={2}
-                    py={1}
-                    w={"100px"}
-                    ml={{
-                      base: "0",
-                      md: "5px",
-                      lg: "26px",
-                    }}
-                    mt={{
-                      base: "0",
-                      md: "68px",
-                      lg: "5px",
-                    }}
-                    borderRadius="md"
-                    fontSize="xs"
-                    fontWeight="bold"
-                    zIndex={1}
+                  <MotionBox
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9 }}
                   >
-                    {jewel.promotionTag || "PROMOÇÃO"}
-                  </Box>
+                    <Box
+                      position={"absolute"}
+                      bg="red.500"
+                      color="white"
+                      px={2}
+                      py={1}
+                      w={"100px"}
+                      ml={{
+                        base: "0",
+                        md: "5px",
+                        lg: "26px",
+                      }}
+                      mt={{
+                        base: "0",
+                        md: "68px",
+                        lg: "5px",
+                      }}
+                      borderRadius="md"
+                      fontSize="xs"
+                      fontWeight="bold"
+                      zIndex={1}
+                    >
+                      {jewel.promotionTag || "PROMOÇÃO"}
+                    </Box>
+                  </MotionBox>
                 )}
                 <Dialog.Root
                   onOpenChange={(isOpen) => {
@@ -178,7 +187,12 @@ const Catalog = () => {
                   }}
                 >
                   <Dialog.Trigger asChild>
-                    <Box>
+                    <MotionBox
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 1.0 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                    >
                       <Image
                         src={jewel.imageBase64}
                         alt={jewel.name}
@@ -193,12 +207,17 @@ const Catalog = () => {
                         transition="transform 0.2s"
                         _hover={{ transform: "scale(1.05)" }}
                       />
-                    </Box>
+                    </MotionBox>
                   </Dialog.Trigger>
                   <Portal>
                     <Dialog.Backdrop />
                     <Dialog.Positioner>
-                      <Dialog.Content bg="#e8e2d2" maxW="90vw" mt="10px" p={4}>
+                      <Dialog.Content
+                        bg="#e8e2d2"
+                        maxW={{ base: "90vw", md: "600px" }}
+                        mt="10px"
+                        p={4}
+                      >
                         <Dialog.Header>
                           <Dialog.Title
                             color="#1c3050"
@@ -217,52 +236,82 @@ const Catalog = () => {
                         <Dialog.Body>
                           {selectedJewel && (
                             <>
-                              <Image
-                                src={selectedJewel.imageBase64}
-                                alt={selectedJewel.name}
-                                objectFit="contain"
-                                h={{ base: "70vh", md: "70vh" }}
-                                mt="-50px"
-                                w="100%"
-                              />
+                              <MotionBox
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.9 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                              >
+                                <Image
+                                  src={selectedJewel.imageBase64}
+                                  alt={selectedJewel.name}
+                                  objectFit="contain"
+                                  h={{ base: "60vh", md: "70vh" }}
+                                  mt="-50px"
+                                  w="100%"
+                                />
+                              </MotionBox>
+
                               {selectedJewel.isPromotion &&
                               selectedJewel.originalPrice ? (
-                                <Box alignItems="center" gap={2} mb={1}>
+                                <MotionBox
+                                  initial={{ opacity: 0, y: 30 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.9 }}
+                                  mt={4}
+                                >
+                                  <Box alignItems="center" gap={2} mb={1}>
+                                    <Text
+                                      color="red.500"
+                                      fontWeight="bold"
+                                      fontSize="lg"
+                                    >
+                                      {selectedJewel.price}
+                                    </Text>
+                                    <Text
+                                      color="gray.500"
+                                      textDecoration="line-through"
+                                      fontSize="sm"
+                                      mt={1}
+                                    >
+                                      {selectedJewel.originalPrice}
+                                    </Text>
+                                  </Box>
+                                </MotionBox>
+                              ) : (
+                                <MotionBox
+                                  initial={{ opacity: 0, y: 30 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.9 }}
+                                >
                                   <Text
-                                    color="red.500"
-                                    fontWeight="bold"
-                                    fontSize="lg"
+                                    color="blue.600"
+                                    fontWeight="medium"
+                                    mb={1}
                                   >
                                     {selectedJewel.price}
                                   </Text>
+                                </MotionBox>
+                              )}
+                              <MotionBox
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 1.0 }}
+                              >
+                                <Box mt={4} p={4}>
                                   <Text
-                                    color="gray.500"
-                                    textDecoration="line-through"
-                                    fontSize="sm"
+                                    fontSize="md"
+                                    color="gray.700"
+                                    lineHeight="tall"
+                                    whiteSpace="pre-line"
                                   >
-                                    {selectedJewel.originalPrice}
+                                    Descrição:
+                                  </Text>
+                                  <Text mt={2}>
+                                    {selectedJewel.description}
                                   </Text>
                                 </Box>
-                              ) : (
-                                <Text
-                                  color="blue.600"
-                                  fontWeight="medium"
-                                  mb={1}
-                                >
-                                  {selectedJewel.price}
-                                </Text>
-                              )}
-                              <Box mt={4} p={4}>
-                                <Text
-                                  fontSize="md"
-                                  color="gray.700"
-                                  lineHeight="tall"
-                                  whiteSpace="pre-line"
-                                >
-                                  Descrição:
-                                </Text>
-                                <Text mt={2}>{selectedJewel.description}</Text>
-                              </Box>
+                              </MotionBox>
                             </>
                           )}
                         </Dialog.Body>
