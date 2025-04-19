@@ -24,6 +24,7 @@ import { colorPalettes } from "../../compositions/lib/color-palettes";
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 import { useJewel } from "@/context/JewelContext";
 
+
 const AdminPanel = () => {
   const {
     name,
@@ -47,9 +48,7 @@ const AdminPanel = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
 
-
   const [errorMessage, setErrorMessage] = useState<string>("");
-
 
   const [showManagePanel, setShowManagePanel] = useState(false);
 
@@ -100,7 +99,6 @@ const AdminPanel = () => {
       return;
     }
 
-
     setStatus("uploading");
     try {
       await uploadJewelry(
@@ -143,20 +141,17 @@ const AdminPanel = () => {
     setImage(null);
     setIsPromotion(false);
     setOriginalPrice("");
-    
   };
-  
 
   useEffect(() => {
     if (editingJewel) {
-    
     } else {
       resetForm();
     }
   }, [editingJewel]);
 
   useEffect(() => {
-          console.log(name)
+    console.log(name);
     return () => {
       if (preview) {
         URL.revokeObjectURL(preview);
@@ -236,17 +231,19 @@ const AdminPanel = () => {
         />
       ) : (
         <>
-          <HStack justifyContent={"center"} alignItems={"center"}>
-            <Button
-              onClick={switchToManagePanel}
-              color={"white"}
-              justifyContent={"center"}
-              alignItems={"center"}
-              bg={"#102c5b"}
-            >
-              <GiJewelCrown /> Gerenciar
-            </Button>
-          </HStack>
+           
+            <HStack justifyContent={"center"} alignItems={"center"}>
+              <Button
+                onClick={switchToManagePanel}
+                color={"white"}
+                justifyContent={"center"}
+                alignItems={"center"}
+                bg={"#102c5b"}
+              >
+                <GiJewelCrown /> Gerenciar
+              </Button>
+            </HStack>
+      
 
           <Text fontSize="xl" mb={4} fontWeight="bold">
             Cadastrar Joia
@@ -334,7 +331,6 @@ const AdminPanel = () => {
               size="sm"
               width="320px"
               multiple
-
             >
               <Select.HiddenSelect />
 

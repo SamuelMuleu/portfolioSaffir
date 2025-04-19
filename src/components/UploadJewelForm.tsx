@@ -28,12 +28,10 @@ const UploadJewelForm = ({
   onSuccess,
   onCancel,
 }: UploadJewelFormProps) => {
-
   const [preview, setPreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [error, setError] = useState("");
-
 
   const {
     name,
@@ -77,7 +75,6 @@ const UploadJewelForm = ({
     setPrice(formattedValue);
   };
 
-
   useEffect(() => {
     if (editingJewel) {
       console.log("Dados completos da joia:", editingJewel);
@@ -86,12 +83,13 @@ const UploadJewelForm = ({
       setCategories(editingJewel.categories);
       setDescription(editingJewel.description);
       setPreview(editingJewel.imageBase64);
+
       setIsPromotion(
-        editingJewel.isPromotion || editingJewel.categories.includes("Promoção" as JewelCategory)
+        editingJewel.isPromotion ||
+          editingJewel.categories.includes("Promoção" as JewelCategory)
       );
 
-        setOriginalPrice(editingJewel.originalPrice || "");
-  
+      setOriginalPrice(editingJewel.originalPrice || "");
     } else {
       setName("");
       setPrice("");
@@ -114,6 +112,7 @@ const UploadJewelForm = ({
     }
 
     setImage(file);
+
     setPreview(URL.createObjectURL(file));
     setError("");
   };
@@ -153,6 +152,7 @@ const UploadJewelForm = ({
             ? [...new Set([...categories, "Promoção" as JewelCategory])]
             : categories.filter((cat) => cat !== "Promoção"),
           description,
+       
           image: image || undefined,
           isPromotion,
           originalPrice: isPromotion ? originalPrice : undefined,
@@ -278,9 +278,7 @@ const UploadJewelForm = ({
           <Select.Trigger>
             <Select.ValueText
               placeholder={
-                categories
-                  ? categories.join(", ")
-                  : "Selecione as categorias"
+                categories ? categories.join(", ") : "Selecione as categorias"
               }
               mx="auto"
               color={"white"}

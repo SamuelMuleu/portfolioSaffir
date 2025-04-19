@@ -2,10 +2,11 @@ import { Box, Center, Heading, Image } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
+import Login from "./Pages/Login/Login";
 import logo from "./assets/logo.png";
 import Footer from "./components/Footer";
-import {JewelProvider} from "@/context/JewelProvider";
-
+import { JewelProvider } from "@/context/JewelProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -27,9 +28,19 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Catalog />} />
-
-              <Route path="/admin/dashboard" element={<AdminPanel />} />
-              <Route path="/admin/jewel/:id" element={<AdminPanel />} />
+              <Route path="/login" element={<Login />} />
+              
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/admin/jewel/:id" element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              } />
             </Routes>
             <Footer />
           </Box>

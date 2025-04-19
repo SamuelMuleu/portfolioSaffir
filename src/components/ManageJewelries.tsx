@@ -15,6 +15,9 @@ import { Jewel } from "@/types/Jewel";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { LuSearch } from "react-icons/lu";
+import { auth } from "@/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { IoLogOut } from "react-icons/io5";
 
 type ManageJewelriesProps = {
   switchToUploadPanel: () => void;
@@ -59,8 +62,8 @@ const ManageJewelries = ({
             : data.category
             ? [data.category]
             : [],
-            originalPrice: data.originalPrice,
-            description: data.description || "",
+          originalPrice: data.originalPrice,
+          description: data.description || "",
           imageBase64: data.imageBase64 || "",
         } as Jewel;
       });
@@ -101,6 +104,9 @@ const ManageJewelries = ({
     setEditingJewel(null);
     switchToUploadPanel();
   };
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
 
   return (
     <Box>
@@ -111,15 +117,28 @@ const ManageJewelries = ({
         justifyContent={"center"}
         direction={{ base: "column", md: "row" }}
       >
-        <Button onClick={handleAddNew} mb={4} size="sm">
-          Adicionar Nova Joia
-        </Button>
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          mb={4}
+        gap={4}
+        >
+          <Button onClick={handleAddNew} size="sm">
+            Adicionar Nova Joia
+          </Button>
+          <Button onClick={handleLogout} colorScheme="red" h="36px">
+            Sair
+            <IoLogOut />
+          </Button>
+        </Box>
 
         <InputGroup maxW="400px" startElement={<LuSearch />} mb={4}>
           <Input
-            placeholder="Buscar joia"
+            placeholder="Buscar joias"
             value={searchTerm}
             height="36px"
+            w="150px"
             borderRadius={"lg"}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setSearchTerm(e.target.value)

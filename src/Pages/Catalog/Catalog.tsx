@@ -185,6 +185,7 @@ const Catalog = () => {
                         objectFit="contain"
                         rounded="xs"
                         w={{ base: "100%", md: "300px" }}
+                        h={{ base: "100%", md: "300px" }}
                         maxH={{ base: "100%", md: "350px" }}
                         mx="auto"
                         loading="lazy"
@@ -225,7 +226,7 @@ const Catalog = () => {
                                 w="100%"
                               />
                               {selectedJewel.isPromotion &&
-                                selectedJewel.originalPrice ? (
+                              selectedJewel.originalPrice ? (
                                 <Box alignItems="center" gap={2} mb={1}>
                                   <Text
                                     color="red.500"
@@ -278,7 +279,11 @@ const Catalog = () => {
               </Box>
             ))}
           </Grid>
-          <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={(newPage) => setCurrentPage(newPage)} />
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setCurrentPage(newPage)}
+          />
         </>
       )}
     </Box>
