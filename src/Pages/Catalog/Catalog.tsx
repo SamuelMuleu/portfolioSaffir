@@ -198,8 +198,9 @@ const Catalog = () => {
                         alt={jewel.name}
                         objectFit="cover"
                         rounded="xs"
+                        boxSize={{ base: "200px", md: "350px" }}
+                        maxW={{ base: "100%", md: "300px" }}
                         w={{ base: "100%", md: "300px" }}
-                        h={{ base: "100%", md: "300px" }}
                         maxH={{ base: "100%", md: "350px" }}
                         mx="auto"
                         loading="lazy"
@@ -253,7 +254,7 @@ const Catalog = () => {
                               </MotionBox>
 
                               {selectedJewel.isPromotion &&
-                              selectedJewel.originalPrice ? (
+                                selectedJewel.originalPrice ? (
                                 <MotionBox
                                   initial={{ opacity: 0, y: 30 }}
                                   animate={{ opacity: 1, y: 0 }}
