@@ -164,7 +164,7 @@ const Catalog = () => {
                       ml={{
                         base: "0",
                         md: "5px",
-                        lg: "26px",
+                        lg: "66px",
                       }}
                       mt={{
                         base: "0",
@@ -196,7 +196,7 @@ const Catalog = () => {
                       <Image
                         src={jewel.imageBase64}
                         alt={jewel.name}
-                        objectFit="contain"
+                        objectFit="cover"
                         rounded="xs"
                         w={{ base: "100%", md: "300px" }}
                         h={{ base: "100%", md: "300px" }}
