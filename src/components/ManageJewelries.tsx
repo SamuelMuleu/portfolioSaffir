@@ -197,6 +197,9 @@ const ManageJewelries = ({
               <Text color="blue.600" fontWeight="medium" mb={1}>
                 {jewel.price}
               </Text>
+              <Text color="red.500" fontWeight="medium" mb={1}>
+                {jewel.originalPrice}
+              </Text>
               <Text color="gray.500" fontWeight="medium" mb={1}>
                 {jewel.description}
               </Text>
