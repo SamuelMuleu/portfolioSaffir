@@ -11,6 +11,7 @@ import {
   CloseButton,
   Dialog,
   Portal,
+  AspectRatio,
 } from "@chakra-ui/react";
 import { Jewel, JewelCategory } from "@/types/Jewel";
 import { CategoryFilter } from "@/components/CategoryFIlter";
@@ -137,6 +138,8 @@ const Catalog = () => {
               md: "repeat(3, 1fr)",
               lg: "repeat(4, 1fr)",
             }}
+            justifyContent={"center"}
+            ml={{ md: 10 }}
             gap={6}
           >
             {paginatedJewels.map((jewel) => (
@@ -193,20 +196,25 @@ const Catalog = () => {
                       transition={{ duration: 1.0 }}
                       whileInView={{ opacity: 1, y: 0 }}
                     >
-                      <Image
-                        src={jewel.imageBase64}
-                        alt={jewel.name}
-                        objectFit="contain"
-                        rounded="xs"
-                        w={{ base: "100%", md: "300px" }}
-                        h={{ base: "100%", md: "300px" }}
-                        maxH={{ base: "100%", md: "350px" }}
-                        mx="auto"
-                        loading="lazy"
-                        cursor="pointer"
-                        transition="transform 0.2s"
-                        _hover={{ transform: "scale(1.05)" }}
-                      />
+                      <AspectRatio
+                        ratio={1}
+                        maxW={{ base: "100%", md: "80%", lg: "90%" }}
+                      >
+                        <Image
+                          src={jewel.imageBase64}
+                          alt={jewel.name}
+                          objectFit="contain"
+                          rounded="xs"
+                          w={{ base: "100%", md: "300px" }}
+                          h={{ base: "100%", md: "300px" }}
+                          maxH={{ base: "100%", md: "350px" }}
+                          mx="auto"
+                          loading="lazy"
+                          cursor="pointer"
+                          transition="transform 0.2s"
+                          _hover={{ transform: "scale(1.05)" }}
+                        />
+                      </AspectRatio>
                     </MotionBox>
                   </Dialog.Trigger>
                   <Portal>
