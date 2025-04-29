@@ -172,9 +172,9 @@ const ManageJewelries = ({
               borderRadius="md"
               mx={"auto"}
               width={{
-                base: "70%",
-                md: "80%",
-                lg: "90%",
+                base: "60%",
+                md: "100%",
+                lg: "100%",
               }}
               height={"100%"}
               boxShadow="md"
@@ -223,16 +223,17 @@ const ManageJewelries = ({
               ))}
 
               <Flex mt={3} gap={2}>
-                <Link to={`/admin/jewel/${jewel.id}`}>
-                  <Button size="sm" flex={1} variant="outline">
+                <Link to={`/admin/jewel/${jewel.id}`} >
+                  <Button size="sm" flex={1} variant="outline" >
                     Editar
                   </Button>
                 </Link>
                 <Button
+               
                   size="sm"
                   color={"red.400"}
+                  
                   onClick={() => handleDelete(jewel.id)}
-                  flex={1}
                   loading={deletingId === jewel.id}
                   loadingText="Excluindo..."
                 >
