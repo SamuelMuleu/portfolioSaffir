@@ -196,7 +196,7 @@ const Catalog = () => {
                       transition={{ duration: 1.0 }}
                       whileInView={{ opacity: 1, y: 0 }}
                     >
-                      <AspectRatio ratio={1} maxW={{ base: "100%", md: "80%",lg:"90%" }}>
+                      <AspectRatio ratio={1} maxW={{ base: "100%", md: "90%",lg:"90%" }}>
                       <Image
                         src={jewel.imageBase64}
                         alt={jewel.name}
