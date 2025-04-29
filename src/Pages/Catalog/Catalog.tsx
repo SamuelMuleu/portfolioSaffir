@@ -139,7 +139,7 @@ const Catalog = () => {
               lg: "repeat(4, 1fr)",
             }}
             justifyContent={"center"}
-            ml={{ md: 10 }}
+            ml={{ md: 5 }}
             gap={6}
           >
             {paginatedJewels.map((jewel) => (
