@@ -55,12 +55,14 @@ const Catalog = () => {
 
   const dynamicCategories = useMemo(() => {
     if (!jewels) return ["todos"];
-
     const allCategories = jewels.flatMap((jewel) =>
-      Array.isArray(jewel?.categories) ? jewel.categories : []
+      Array.isArray(jewel?.categories)
+        ? jewel.categories.map((cat) => cat.trim().toLowerCase())
+        : []
     );
 
-    return ["todos", ...Array.from(new Set(allCategories))];
+    const uniqueCategories = Array.from(new Set(allCategories));
+    return ["todos", ...uniqueCategories];
   }, [jewels]);
 
   const filteredJewels = useMemo(() => {
@@ -196,21 +198,25 @@ const Catalog = () => {
                       transition={{ duration: 1.0 }}
                       whileInView={{ opacity: 1, y: 0 }}
                     >
-                      <AspectRatio ratio={1} maxW={{ base: "100%", md: "90%",lg:"90%" }}>
-                      <Image
-                        src={jewel.imageBase64}
-                        alt={jewel.name}
-                        objectFit="contain"
-                        rounded="xs"
-                        w={{ base: "100%", md: "300px" }}
-                        h={{ base: "100%", md: "300px" }}
-                        maxH={{ base: "100%", md: "350px" }}
-                        mx="auto"
-                        loading="lazy"
-                        cursor="pointer"
-                        transition="transform 0.2s"
-                        _hover={{ transform: "scale(1.05)" }}
-                      />
+                      <AspectRatio
+                        ratio={1}
+                        maxW={{ base: "100%", md: "90%", lg: "90%" }}
+                      >
+                        <Image
+                          src={jewel.imageBase64}
+                          alt={jewel.name}
+                          objectFit="contain"
+                          rounded="xs"
+                          
+                          w={{ base: "100%", md: "300px" }}
+                          h={{ base: "100%", md: "300px" }}
+                          maxH={{ base: "100%", md: "350px" }}
+                          mx="auto"
+                          loading="lazy"
+                          cursor="pointer"
+                          transition="transform 0.2s"
+                          _hover={{ transform: "scale(1.05)" }}
+                        />
                       </AspectRatio>
                     </MotionBox>
                   </Dialog.Trigger>
@@ -258,7 +264,7 @@ const Catalog = () => {
                               </MotionBox>
 
                               {selectedJewel.isPromotion &&
-                                selectedJewel.originalPrice ? (
+                              selectedJewel.originalPrice ? (
                                 <MotionBox
                                   initial={{ opacity: 0, y: 30 }}
                                   animate={{ opacity: 1, y: 0 }}
