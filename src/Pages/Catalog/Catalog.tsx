@@ -70,12 +70,11 @@ const Catalog = () => {
       return jewels;
     }
 
-    return jewels.filter((jewel) => {
-      if (!jewel || !Array.isArray(jewel.categories)) {
-        return false;
-      }
-      return jewel.categories.includes(selectedCategory as JewelCategory);
-    });
+    return jewels.filter((jewel) =>
+      jewel.categories?.some(
+        (cat) => cat.trim().toLowerCase() === selectedCategory.toLowerCase()
+      )
+    );
   }, [jewels, selectedCategory]);
 
   const paginatedJewels = useMemo(() => {
@@ -207,7 +206,6 @@ const Catalog = () => {
                           alt={jewel.name}
                           objectFit="contain"
                           rounded="xs"
-                          
                           w={{ base: "100%", md: "300px" }}
                           h={{ base: "100%", md: "300px" }}
                           maxH={{ base: "100%", md: "350px" }}
