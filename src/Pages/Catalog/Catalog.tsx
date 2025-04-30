@@ -13,7 +13,7 @@ import {
   Portal,
   AspectRatio,
 } from "@chakra-ui/react";
-import { Jewel, JewelCategory } from "@/types/Jewel";
+import { Jewel } from "@/types/Jewel";
 import { CategoryFilter } from "@/components/CategoryFIlter";
 import { PaginationControls } from "@/components/PaginationControls";
 import { motion } from "framer-motion";
