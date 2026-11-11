@@ -16,7 +16,7 @@ import {
 import { Jewel } from "@/types/Jewel";
 import { CategoryFilter } from "@/components/CategoryFIlter";
 import { PaginationControls } from "@/components/PaginationControls";
-import { motion } from "framer-motion";
+import { MotionBox } from "@/components/MotionBox";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -27,8 +27,6 @@ const Catalog = () => {
   const [selectedJewel, setSelectedJewel] = useState<Jewel | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
   const [currentPage, setCurrentPage] = useState(1);
-
-  const MotionBox = motion(Box);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -231,14 +229,18 @@ const Catalog = () => {
                           <Dialog.Title
                             color="#1c3050"
                             fontWeight={"bold"}
-                          ></Dialog.Title>
+                            pr={10}
+                          >
+                            {selectedJewel?.name}
+                          </Dialog.Title>
                           <Dialog.CloseTrigger asChild>
                             <CloseButton
+                              aria-label="Fechar"
                               position="absolute"
                               right="8px"
                               top="8px"
                               fontWeight={"bold"}
-                              color="white"
+                              color="#1c3050"
                             />
                           </Dialog.CloseTrigger>
                         </Dialog.Header>
@@ -255,8 +257,7 @@ const Catalog = () => {
                                   src={selectedJewel.imageBase64}
                                   alt={selectedJewel.name}
                                   objectFit="contain"
-                                  h={{ base: "60vh", md: "70vh" }}
-                                  mt="-50px"
+                                  maxH={{ base: "55vh", md: "65vh" }}
                                   w="100%"
                                 />
                               </MotionBox>

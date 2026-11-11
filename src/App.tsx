@@ -1,4 +1,4 @@
-import { Box, Center, Heading, Image } from "@chakra-ui/react";
+import { Center, Heading, Image } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Catalog from "./Pages/Catalog/Catalog";
 import AdminPanel from "./Pages/Admin/AdminPanel";
@@ -7,11 +7,10 @@ import logo from "./assets/logo.png";
 import Footer from "./components/Footer";
 import { JewelProvider } from "@/context/JewelProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { motion } from "framer-motion";
+import { MotionBox } from "./components/MotionBox";
 import {UploadJewelForm} from "./components/UploadJewelForm";
 
 function App() {
-  const MotionBox = motion(Box);
   return (
     <JewelProvider>
       <Router>
@@ -25,7 +24,7 @@ function App() {
           <Heading mb={4}>
               <Image
                 src={logo}
-                alt="logo"
+                alt="Saffir Joalheria & Ourivesaria"
                 boxSize="200px"
                 objectFit="contain"
                 borderRadius="md"
