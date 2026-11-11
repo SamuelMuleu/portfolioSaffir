@@ -144,14 +144,10 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    if (editingJewel) {
-    } else {
-      resetForm();
-    }
+    if (!editingJewel) resetForm();
   }, [editingJewel]);
 
   useEffect(() => {
-    console.log(name);
     return () => {
       if (preview) {
         URL.revokeObjectURL(preview);
